@@ -73,7 +73,7 @@ instituicao(4, hospital_da_luz, lisboa).
 
 cuidado(2-6-2018, 15:30, 3, 3, checkup, 10).
 cuidado(10-4-2018, 16:00, 2, 1, ansiedade, 4).
-cuidado(16-5-2018, 9:00, 3, 4, alergia_na_pele, 60).
+cuidado(16-5-2018, 9:00, 2, 4, alergia_na_pele, 60).
 cuidado(20-10-2018, 10:45, 1, 4, acne, 60).
 
 %Invariante Estrutural: não permitir a inserção de conhecimento repetido
@@ -140,11 +140,21 @@ identificaInstNome(N,S) :- solucoes((ID,N,L), instituicao(ID,N,L), S).
 identificaInstLoc(L,S) :- solucoes((ID,N), instituicao(ID,N,L), S).
 
 % Identificar cuidados de saúde prestados por critérios de seleção tais como instituição/cidade/datas
+identificaCuidadoIDU(IDu,S) :- solucoes((D,H,IDu,IDp,DC,C), cuidado(D,H,IDu,IDp,DC,C), S).
+identificaCuidadoIDP(IDp,S) :- solucoes((D,H,IDu,IDp,DC,C), cuidado(D,H,IDu,IDp,DC,C), S).
 identificaCuidadoIDInst(IDi,S) :- solucoes((D,H,IDu,IDp,DC,C), (prestador(IDp,_,_,IDi), cuidado(D,H,IDu,IDp,DC,C)), S).
 identificaCuidadoNomeInst(Ni,S) :- solucoes((D,H,IDu,IDp,DC,C), (instituicao(IDi,Ni,_), prestador(IDp,_,_,IDi), cuidado(D,H,IDu,IDp,DC,C)), S).
 identificaCuidadoCidade(L,S) :- solucoes((D,H,IDu,IDp,DC,C), (instituicao(IDi,_,L), prestador(IDp,_,_,IDi), cuidado(D,H,IDu,IDp,DC,C)), S).
 identificaCuidadoData(D,S) :- solucoes((D,H,IDu,IDp,DC,C), cuidado(D,H,IDu,IDp,DC,C), S).
 identificaCuidadoDataHora(D,H,S) :- solucoes((D,H,IDu,IDp,DC,C), cuidado(D,H,IDu,IDp,DC,C), S).
 
-%Calcular o custo total dos cuidados de saúde por critérios tais como utente/especialidade/prestador/datas
+%Calcular o custo total dos cuidados presentes numa lista
+somaCusto([C],C).
+somaCusto([C|T],R) :- somaCusto(T,N), R is N+C.
 
+%Calcular o custo total dos cuidados de saúde por critérios tais como utente/especialidade/prestador/datas
+custoUtente(IDu,N) :- solucoes(C, cuidado(_,_,IDu,_,_,C), S), somaCusto(S,N).
+custoEspecialidade(E,N) :- solucoes(C, (cuidado(_,_,_,IDp,_,C), prestador(IDp,_,E,_)), S), somaCusto(S,N).
+custoPrestador(IDp,N) :- solucoes(C, cuidado(_,_,_,IDp,_,C), S), somaCusto(S,N).
+custoData(D,N) :- solucoes(C, cuidado(D,_,_,_,_,C), S), somaCusto(S,N).
+%custoDatas(Di,Df,N) :- TENHO QUE PENSAR MELHOR NESTA
