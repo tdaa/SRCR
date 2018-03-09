@@ -149,12 +149,19 @@ identificaCuidadoData(D,S) :- solucoes((D,H,IDu,IDp,DC,C), cuidado(D,H,IDu,IDp,D
 identificaCuidadoDataHora(D,H,S) :- solucoes((D,H,IDu,IDp,DC,C), cuidado(D,H,IDu,IDp,DC,C), S).
 
 %Calcular o custo total dos cuidados presentes numa lista
+somaCusto([],0).
 somaCusto([C],C).
 somaCusto([C|T],R) :- somaCusto(T,N), R is N+C.
+
+%Determinar lista de custos ocorridos entre determinadas datas -- NÃO DÁ AS DATAS DIREITO
+custoPorDatas([(D,C)],Di,Df,[Y]) :- D >= Di, D =< Df, Y is C.
+custoPorDatas([(D,C)],Di,Df,[]) :- D =< Di; D >= Df.
+custoPorDatas([(D,C)|T],Di,Df,[C|R]) :- D >= Di, D =< Df, custoPorDatas(T,Di,Df,R).
+custoPorDatas([(D,C)|T],Di,Df,R) :- (D =< Di; D >= Df), custoPorDatas(T,Di,Df,R).
 
 %Calcular o custo total dos cuidados de saúde por critérios tais como utente/especialidade/prestador/datas
 custoUtente(IDu,N) :- solucoes(C, cuidado(_,_,IDu,_,_,C), S), somaCusto(S,N).
 custoEspecialidade(E,N) :- solucoes(C, (cuidado(_,_,_,IDp,_,C), prestador(IDp,_,E,_)), S), somaCusto(S,N).
 custoPrestador(IDp,N) :- solucoes(C, cuidado(_,_,_,IDp,_,C), S), somaCusto(S,N).
 custoData(D,N) :- solucoes(C, cuidado(D,_,_,_,_,C), S), somaCusto(S,N).
-%custoDatas(Di,Df,N) :- TENHO QUE PENSAR MELHOR NESTA
+custoDatas(Di,Df,N) :- solucoes((D,C), cuidado(D,_,_,_,_,C), S), custoPorDatas(S,Di,Df,R), somaCusto(R,N). %NÃO FUNCIONAAAAAAAAAAAAAA
