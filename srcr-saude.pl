@@ -165,3 +165,12 @@ custoEspecialidade(E,N) :- solucoes(C, (cuidado(_,_,_,IDp,_,C), prestador(IDp,_,
 custoPrestador(IDp,N) :- solucoes(C, cuidado(_,_,_,IDp,_,C), S), somaCusto(S,N).
 custoData(D,N) :- solucoes(C, cuidado(D,_,_,_,_,C), S), somaCusto(S,N).
 custoDatas(Di,Df,N) :- solucoes((D,C), cuidado(D,_,_,_,_,C), S), custoPorDatas(S,Di,Df,R), somaCusto(R,N). % NÃO FUNCIONAAAAAAAAAAAAAA
+
+%Identificar Utentes de um prestador/especialidade/instituicao
+identificaUtenteIDP(IDp,S) :- solucoes((IDu,N,I,M), (prestador(IDp,_,_,_), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S).
+identificaUtenteNomePrest(Np,S) :- solucoes((IDu,N,I,M), (prestador(IDp,Np,_,_), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S).
+identificaUtenteSpec(E,S) :- solucoes((IDu,N,I,M), (prestador(IDp,_,E,_), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S).
+identificaUtenteInst(IDi,S) :- solucoes((IDu,N,I,M), (instituicao(IDi,_,_), prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S).
+identificaUtenteNomeInst(Ni,S) :- solucoes((IDu,N,I,M), (instituicao(IDi,Ni,_), prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S).
+identificaUtenteCidadeInst(L,S) :- solucoes((IDu,N,I,M), (instituicao(IDi,_,L), prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S).
+
