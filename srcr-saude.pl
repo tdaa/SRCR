@@ -137,7 +137,6 @@ identificaInstID(ID,N) :- instituicao(ID,N,L).
 identificaInstNome(N,S) :- solucoes((ID,N,L), instituicao(ID,N,L), S).
 identificaInstLoc(L,S) :- solucoes((ID,N), instituicao(ID,N,L), S).
 
-
 %Identificar cuidados de saúde prestados por critérios de seleção tais como utente/prestador/instituição/cidade/datas
 identificaCuidadoIDU(IDu,S) :- solucoes((D,H,IDu,IDp,IDInst,DC,C), cuidado(D,H,IDu,IDp,IDInst,DC,C), S).
 identificaCuidadoIDP(IDp,S) :- solucoes((D,H,IDu,IDp,IDInst,DC,C), cuidado(D,H,IDu,IDp,IDInst,DC,C), S).
@@ -147,7 +146,7 @@ identificaCuidadoCidade(L,S) :- solucoes((D,H,IDu,IDp,IDi,DC,C), (instituicao(ID
 identificaCuidadoData(D,S) :- solucoes((D,H,IDu,IDp,IDi,DC,C), cuidado(D,H,IDu,IDp,IDi,DC,C), S).
 identificaCuidadoDataHora(D,H,S) :- solucoes((D,H,IDu,IDp,IDi,DC,C), cuidado(D,H,IDu,IDp,IDi,DC,C), S).
 
-%Identificar Utentes de um prestador/especialidade/instituicao
+%Identificar utentes de um prestador/especialidade/instituicao
 identificaUtenteIDP(IDp,S) :- solucoes((IDu,N,I,M), (cuidado(_,_,IDu,IDp,_,_,_), utente(IDu,N,I,M)), S).
 identificaUtenteNomePrest(Np,S) :- solucoes((IDu,N,I,M), (prestador(IDp,Np,_,_), cuidado(_,_,IDu,IDp,_,_,_), utente(IDu,N,I,M)), S).
 identificaUtenteEsp(E,S) :- solucoes((IDu,N,I,M), (prestador(IDp,_,E,_), cuidado(_,_,IDu,IDp,_,_,_), utente(IDu,N,I,M)), S).
@@ -159,7 +158,6 @@ identificaUtenteCidade(L,S) :- solucoes((IDu,N,I,M), (instituicao(IDi,_,L), cuid
 identificaInstPrestIDU(IDu,S) :- solucoes((IDi,Ni,IDp,Nome,Esp), (cuidado(D,H,IDu,IDp,IDi,De,C), prestador(IDp, Nome, Esp, IDi), instituicao(IDi,Ni,L)), S).
 
 %Calcular o custo total dos cuidados presentes numa lista
-
 somaCusto([],0).
 somaCusto([C],C).
 somaCusto([C|T],R) :- somaCusto(T,N), R is N+C.
@@ -171,19 +169,8 @@ custoPorDatas([(Y-M-D,C)|T],Yi-Mi-Di,Yf-Mf-Df,[C|R]) :- D >= Di, D =< Df, custoP
 custoPorDatas([(Y-M-D,C)|T],Yi-Mi-Di,Yf-Mf-Df,R) :- (D =< Di; D >= Df), custoPorDatas(T,Di,Df,R).
 
 %Calcular o custo total dos cuidados de saúde por critérios tais como utente/especialidade/prestador/datas
-
 custoUtente(IDu,N) :- solucoes(C, cuidado(_,_,IDu,_,_,_,C), S), somaCusto(S,N).
 custoEspecialidade(E,N) :- solucoes(C, (cuidado(_,_,_,IDp,_,_,C), prestador(IDp,_,E,_)), S), somaCusto(S,N).
 custoPrestador(IDp,N) :- solucoes(C, cuidado(_,_,_,IDp,_,_,C), S), somaCusto(S,N).
 custoData(D,N) :- solucoes(C, cuidado(D,_,_,_,_,_,C), S), somaCusto(S,N).
 custoDatas(Di,Df,N) :- solucoes((D,C), cuidado(D,_,_,_,_,_,C), S), custoPorDatas(S,Di,Df,R), somaCusto(R,N). % NÃO FUNCIONAAAAAAAAAAAAAA
-
-
-%Identificar Utentes de um prestador/especialidade/instituicao
-identificaUtenteIDP(IDp,S) :- solucoes((IDu,N,I,M), (prestador(IDp,_,_,_), cuidado(_,_,IDu,IDp,_,_,_), utente(IDu,N,I,M)), S).
-identificaUtenteNomePrest(Np,S) :- solucoes((IDu,N,I,M), (prestador(IDp,Np,_,_), cuidado(_,_,IDu,IDp,_,_,_), utente(IDu,N,I,M)), S).
-identificaUtenteSpec(E,S) :- solucoes((IDu,N,I,M), (prestador(IDp,_,E,_), cuidado(_,_,IDu,IDp,_,_,_), utente(IDu,N,I,M)), S).
-identificaUtenteInst(IDi,S) :- solucoes((IDu,N,I,M), (instituicao(IDi,_,_), prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,IDi,_,_), utente(IDu,N,I,M)), S).
-identificaUtenteNomeInst(Ni,S) :- solucoes((IDu,N,I,M), (instituicao(IDi,Ni,_), prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,IDi,_,_), utente(IDu,N,I,M)), S).
-identificaUtenteCidadeInst(L,S) :- solucoes((IDu,N,I,M), (instituicao(IDi,_,L), prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,IDi,_,_), utente(IDu,N,I,M)), S).
-
