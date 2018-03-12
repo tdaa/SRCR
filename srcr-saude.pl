@@ -11,7 +11,7 @@
 :- dynamic utente/4.
 :- dynamic prestador/4.
 :- dynamic instituicao/3.
-:- dynamic cuidado/6.
+:- dynamic cuidado/7.
 
 %Extensão do predicado soluçes
 
