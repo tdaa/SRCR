@@ -71,9 +71,9 @@ instituicao(4, hospital_da_luz, lisboa).
 
 %Extensão do predicado cuidado: data, hora, #IdUt, #IdPrest, #IdInst, Descricao, Custo -> {V,F}
 
-cuidado(2018-6-2, 15:30, 3, 3, 1, checkup, 10).
 cuidado(2018-4-10, 16:00, 2, 1, 3, ansiedade, 4).
 cuidado(2018-5-16, 9:00, 2, 4, 2, alergia_na_pele, 60).
+cuidado(2018-6-2, 15:30, 3, 3, 1, checkup, 10).
 cuidado(2018-10-20, 10:45, 1, 4, 2, acne, 60).
 
 %Invariante Estrutural: não permitir a inserção de conhecimento repetido
@@ -154,23 +154,33 @@ identificaUtenteInst(IDi,S) :- solucoes((IDu,N,I,M), (cuidado(_,_,IDu,_,IDi,_,_)
 identificaUtenteNomeInst(Ni,S) :- solucoes((IDu,N,I,M), (instituicao(IDi,Ni,_), cuidado(_,_,IDu,_,IDi,_,_), utente(IDu,N,I,M)), S).
 identificaUtenteCidade(L,S) :- solucoes((IDu,N,I,M), (instituicao(IDi,_,L), cuidado(_,_,IDu,_,IDi,_,_), utente(IDu,N,I,M)), S).
 
-%Determinar todas as instituições/pretadores a que um utente já recorreu, devolvendo tambem a especialidade que procurou.
+%Determinar todas as instituições/prestadores a que um utente já recorreu, devolvendo tambem a especialidade que procurou.
 identificaInstPrestIDU(IDu,S) :- solucoes((IDi,Ni,IDp,Nome,Esp), (cuidado(D,H,IDu,IDp,IDi,De,C), prestador(IDp, Nome, Esp, IDi), instituicao(IDi,Ni,L)), S).
 
-%Calcular o custo total dos cuidados presentes numa lista
+%Determinar o custo total dos cuidados presentes numa lista
 somaCusto([],0).
 somaCusto([C],C).
 somaCusto([C|T],R) :- somaCusto(T,N), R is N+C.
 
-%Determinar lista de custos ocorridos entre determinadas datas -- NÃO DÁ AS DATAS DIREITO
-custoPorDatas([(Y-M-D,C)],Yi-Mi-Di,Yf-Mf-Df,[C]) :- D >= Di, D =< Df, Y is C.
-custoPorDatas([(Y-M-D,C)],Yi-Mi-Di,Yf-Mf-Df,[]) :- D =< Di; D >= Df.
-custoPorDatas([(Y-M-D,C)|T],Yi-Mi-Di,Yf-Mf-Df,[C|R]) :- D >= Di, D =< Df, custoPorDatas(T,Di,Df,R).
-custoPorDatas([(Y-M-D,C)|T],Yi-Mi-Di,Yf-Mf-Df,R) :- (D =< Di; D >= Df), custoPorDatas(T,Di,Df,R).
+%Determinar a maior entre duas datas
+dataMaior(Y1-M1-D1,Y2-M2-D2,Y2-M2-D2) :- Y2 > Y1; (Y2 == Y1, M2 > M1); (Y2 == Y1, M2 == M1, D2 >= D1).
+dataMaior(Y1-M1-D1,Y2-M2-D2,Y1-M1-D1) :- Y2 < Y1; (Y2 == Y1, M2 < M1); (Y2 == Y1, M2 == M1, D2 < D1).
+
+%Determinar lista de custos ocorridos entre determinadas datas
+custoPorDatas([(D,C)],Di,Df,[]) :- \+dataMaior(Di,D,D); \+dataMaior(D,Df,Df).
+custoPorDatas([(D,C)|T],Di,Df,[C|R]) :- dataMaior(Di,D,D), dataMaior(D,Df,Df), custoPorDatas(T,Di,Df,R).
+custoPorDatas([(D,C)|T],Di,Df,R) :- (\+dataMaior(Di,D,D); \+dataMaior(D,Df,Df)), custoPorDatas(T,Di,Df,R).
 
 %Calcular o custo total dos cuidados de saúde por critérios tais como utente/especialidade/prestador/datas
 custoUtente(IDu,N) :- solucoes(C, cuidado(_,_,IDu,_,_,_,C), S), somaCusto(S,N).
 custoEspecialidade(E,N) :- solucoes(C, (cuidado(_,_,_,IDp,_,_,C), prestador(IDp,_,E,_)), S), somaCusto(S,N).
 custoPrestador(IDp,N) :- solucoes(C, cuidado(_,_,_,IDp,_,_,C), S), somaCusto(S,N).
+custoInstituicao(IDi,S) :- solucoes(C, cuidado(_,_,_,_,IDi,_,C), S), somaCusto(S,N).
 custoData(D,N) :- solucoes(C, cuidado(D,_,_,_,_,_,C), S), somaCusto(S,N).
-custoDatas(Di,Df,N) :- solucoes((D,C), cuidado(D,_,_,_,_,_,C), S), custoPorDatas(S,Di,Df,R), somaCusto(R,N). % NÃO FUNCIONAAAAAAAAAAAAAA
+custoDatas(Di,Df,N) :- solucoes((D,C), cuidado(D,_,_,_,_,_,C), S), custoPorDatas(S,Di,Df,R), somaCusto(R,N).
+
+%Determinar o número de utentes que receberem cuidados numa determinada instituição
+nrUtentesInstituicao(IDi,N) :- solucoes(IDu, (cuidado(_,_,IDu,_,IDi,_,_), utente(IDu,N,I,M)), S), comprimento(S,N).
+
+%Determinar o número de prestadores que trabalham numa determinada instituição
+nrPrestadoresInstituicao(IDi,N) :- solucoes(IDp, prestador(IDp,_,_,IDi), S), comprimento(S,N).
