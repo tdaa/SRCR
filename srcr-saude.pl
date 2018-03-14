@@ -121,6 +121,15 @@ cuidado(2018-10-20, 10:45, 1, 4, acne, 60).
 						 L==0
 					   	).
 
+%Eliminar todas as ocorrências de um deteminado elemento de uma lista
+apagaT([],_,[]).
+apagaT([X|T],X,R) :- apagaT(T,X,R).
+apagaT([X|T],Y,[X|R]) :- X \= Y, apagaT(T,Y,R).
+
+%Eliminar elementos repetidos de uma lista
+apagaRepetidos([],[]).
+apagaRepetidos([H|T],[H|R]) :- apagaT(H,T,L), apagaRepetidos(L,R).
+
 %Identificar utentes por critérios de seleção
 identificaUtenteID(ID,N) :- utente(ID,N,I,M).
 identificaUtenteNome(N,S) :- solucoes((ID,N), utente(ID,N,I,M), S).
@@ -139,24 +148,24 @@ identificaInstNome(N,S) :- solucoes((ID,N,L), instituicao(ID,N,L), S).
 identificaInstLoc(L,S) :- solucoes((ID,N), instituicao(ID,N,L), S).
 
 %Identificar cuidados de saúde prestados por critérios de seleção tais como utente/prestador/instituição/cidade/datas
-identificaCuidadoIDU(IDu,S) :- solucoes((D,H,IDu,IDp,DC,C), cuidado(D,H,IDu,IDp,DC,C), S).
-identificaCuidadoIDP(IDp,S) :- solucoes((D,H,IDu,IDp,DC,C), cuidado(D,H,IDu,IDp,DC,C), S).
-identificaCuidadoIDInst(IDi,S) :- solucoes((D,H,IDu,IDp,DC,C), (prestador(IDp,_,_,IDi), cuidado(D,H,IDu,IDp,DC,C)), S).
-identificaCuidadoNomeInst(Ni,S) :- solucoes((D,H,IDu,IDp,DC,C), (instituicao(IDi,Ni,_), prestador(IDp,_,_,IDi), cuidado(D,H,IDu,IDp,DC,C)), S).
-identificaCuidadoCidade(L,S) :- solucoes((D,H,IDu,IDp,DC,C), (instituicao(IDi,_,L), prestador(IDp,_,_,IDi), cuidado(D,H,IDu,IDp,DC,C)), S).
-identificaCuidadoData(D,S) :- solucoes((D,H,IDu,IDp,DC,C), cuidado(D,H,IDu,IDp,DC,C), S).
-identificaCuidadoDataHora(D,H,S) :- solucoes((D,H,IDu,IDp,DC,C), cuidado(D,H,IDu,IDp,DC,C), S).
+identificaCuidadoIDU(IDu,R) :- solucoes((D,H,IDu,IDp,DC,C), cuidado(D,H,IDu,IDp,DC,C), S), apagaRepetidos(S,R).
+identificaCuidadoIDP(IDp,R) :- solucoes((D,H,IDu,IDp,DC,C), cuidado(D,H,IDu,IDp,DC,C), S), apagaRepetidos(S,R).
+identificaCuidadoIDInst(IDi,R) :- solucoes((D,H,IDu,IDp,DC,C), (prestador(IDp,_,_,IDi), cuidado(D,H,IDu,IDp,DC,C)), S), apagaRepetidos(S,R).
+identificaCuidadoNomeInst(Ni,R) :- solucoes((D,H,IDu,IDp,DC,C), (instituicao(IDi,Ni,_), prestador(IDp,_,_,IDi), cuidado(D,H,IDu,IDp,DC,C)), S), apagaRepetidos(S,R).
+identificaCuidadoCidade(L,R) :- solucoes((D,H,IDu,IDp,DC,C), (instituicao(IDi,_,L), prestador(IDp,_,_,IDi), cuidado(D,H,IDu,IDp,DC,C)), S), apagaRepetidos(S,R).
+identificaCuidadoData(D,R) :- solucoes((D,H,IDu,IDp,DC,C), cuidado(D,H,IDu,IDp,DC,C), S), apagaRepetidos(S,R).
+identificaCuidadoDataHora(D,H,R) :- solucoes((D,H,IDu,IDp,DC,C), cuidado(D,H,IDu,IDp,DC,C), S).
 
 %Identificar utentes de um prestador/especialidade/instituicao
-identificaUtenteIDP(IDp,S) :- solucoes((IDu,N,I,M), (cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S).
-identificaUtenteNomePrest(Np,S) :- solucoes((IDu,N,I,M), (prestador(IDp,Np,_,_), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S).
-identificaUtenteEsp(E,S) :- solucoes((IDu,N,I,M), (prestador(IDp,_,E,_), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S).
-identificaUtenteInst(IDi,S) :- solucoes((IDu,N,I,M), (prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S).
-identificaUtenteNomeInst(Ni,S) :- solucoes((IDu,N,I,M), (instituicao(IDi,Ni,_), prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S).
-identificaUtenteCidade(L,S) :- solucoes((IDu,N,I,M), (instituicao(IDi,_,L), prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S).
+identificaUtenteIDP(IDp,R) :- solucoes((IDu,N,I,M), (cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S), apagaRepetidos(S,R).
+identificaUtenteNomePrest(Np,R) :- solucoes((IDu,N,I,M), (prestador(IDp,Np,_,_), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S), apagaRepetidos(S,R).
+identificaUtenteEsp(E,R) :- solucoes((IDu,N,I,M), (prestador(IDp,_,E,_), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S), apagaRepetidos(S,R).
+identificaUtenteInst(IDi,R) :- solucoes((IDu,N,I,M), (prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S), apagaRepetidos(S,R).
+identificaUtenteNomeInst(Ni,R) :- solucoes((IDu,N,I,M), (instituicao(IDi,Ni,_), prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S), apagaRepetidos(S,R).
+identificaUtenteCidade(L,R) :- solucoes((IDu,N,I,M), (instituicao(IDi,_,L), prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S), apagaRepetidos(S,R).
 
 %Determinar todas as instituições/prestadores a que um utente já recorreu, devolvendo tambem a especialidade que procurou.
-identificaInstPrestIDU(IDu,S) :- solucoes((IDi,Ni,IDp,Nome,Esp), (cuidado(D,H,IDu,IDp,De,C), prestador(IDp, Nome, Esp, IDi), instituicao(IDi,Ni,L)), S).
+identificaInstPrestIDU(IDu,R) :- solucoes((IDi,Ni,IDp,Nome,Esp), (cuidado(D,H,IDu,IDp,De,C), prestador(IDp, Nome, Esp, IDi), instituicao(IDi,Ni,L)), S), apagaRepetidos(S,R).
 
 %Determinar o custo total dos cuidados presentes numa lista
 somaCusto([],0).
@@ -181,17 +190,13 @@ custoData(D,N) :- solucoes(C, cuidado(D,_,_,_,_,C), S), somaCusto(S,N).
 custoDatas(Di,Df,N) :- solucoes((D,C), cuidado(D,_,_,_,_,C), S), custoPorDatas(S,Di,Df,R), somaCusto(R,N).
 
 %Determinar o número de utentes/prestadores que receberem cuidados numa determinada instituição
-nrUtentesInstituicao(IDi,N) :- solucoes(IDu, (prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S), comprimento(S,N).
-nrPrestadoresInstituicao(IDi,N) :- solucoes(IDp, prestador(IDp,_,_,IDi), S), comprimento(S,N).
+nrUtentesInstituicao(IDi,N) :- solucoes(IDu, (prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S), apagaRepetidos(S,R), comprimento(R,N).
+nrPrestadoresInstituicao(IDi,N) :- solucoes(IDp, prestador(IDp,_,_,IDi), S), apagaRepetidos(S,R), comprimento(R,N).
 
 %Predicados auxiliares para determinar o elemento mais repetido de uma lista
 quantidade(X,[],[(X,0)]).
 quantidade(X,[H|T],[(X,N)]) :- X == H, quantidade(X,T,[(X,G)]), N is G+1.
 quantidade(X,[H|T],L) :- X \= H, quantidade(X,T,L).
-
-apagaT([],_,[]).
-apagaT([X|T],X,R) :- apagaT(T,X,R).
-apagaT([X|T],Y,[X|R]) :- X \= Y, apagaT(T,Y,R).
 
 concatenar([],L,L).
 concatenar([X|T],L,[X|R]) :- concatenar(T,L,R).
