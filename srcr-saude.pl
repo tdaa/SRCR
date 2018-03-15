@@ -61,6 +61,7 @@ prestador(1, tania_fernandes, psiquiatria, 3).
 prestador(2, mario_oliveira, clinicaGeral, 2).
 prestador(3, filipa_ferreira, pediatria, 1).
 prestador(4, joao_machado, dermatologia, 2).
+prestador(5, andre_correia, psiquiatria, 4).
 
 %Extensão do predicado instituicao: #IdInst, Designacao, Localidade -> {V,F}
 
@@ -75,6 +76,7 @@ cuidado(2018-4-10, 16:00, 2, 1, ansiedade, 4).
 cuidado(2018-5-16, 9:00, 2, 4, alergia_na_pele, 60).
 cuidado(2018-6-2, 15:30, 3, 3, checkup, 10).
 cuidado(2018-10-20, 10:45, 1, 4, acne, 60).
+cuidado(2018-9-30, 11:00, 3, 5, stress, 30).
 
 %Invariante Estrutural: não permitir a inserção de conhecimento repetido
 
@@ -173,8 +175,12 @@ somaLista([C],C).
 somaLista([C|T],R) :- somaLista(T,N), R is N+C.
 
 %Determinar a maior entre duas datas
-dataMaior(Y1-M1-D1,Y2-M2-D2,Y2-M2-D2) :- Y2 > Y1; (Y2 == Y1, M2 > M1); (Y2 == Y1, M2 == M1, D2 >= D1).
-dataMaior(Y1-M1-D1,Y2-M2-D2,Y1-M1-D1) :- Y2 < Y1; (Y2 == Y1, M2 < M1); (Y2 == Y1, M2 == M1, D2 < D1).
+dataMaior(Y1-M1-D1,Y2-M2-D2,Y2-M2-D2) :- Y2 > Y1. 
+dataMaior(Y1-M1-D1,Y2-M2-D2,Y2-M2-D2) :- Y2 == Y1, M2 > M1.
+dataMaior(Y1-M1-D1,Y2-M2-D2,Y2-M2-D2) :- Y2 == Y1, M2 == M1, D2 >= D1.
+dataMaior(Y1-M1-D1,Y2-M2-D2,Y1-M1-D1) :- Y2 < Y1.
+dataMaior(Y1-M1-D1,Y2-M2-D2,Y1-M1-D1) :- Y2 == Y1, M2 < M1.
+dataMaior(Y1-M1-D1,Y2-M2-D2,Y1-M1-D1) :- Y2 == Y1, M2 == M1, D2 < D1.
 
 %Determinar lista de custos ocorridos entre determinadas datas
 custoPorDatas([(D,C)],Di,Df,[]) :- \+dataMaior(Di,D,D); \+dataMaior(D,Df,Df).
@@ -265,3 +271,25 @@ idadesUtentes([ID|T],[I|R]) :- utente(ID,_,I,_), idadesUtentes(T,R).
 mediaIdadeGeral(R) :- solucoes(I, utente(_,_,I,_), S), mediaLista(S,R).
 mediaIdadeInstituicao(IDi,R) :- solucoes(IDu, (prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_)), S), apagaRepetidos(S,T), idadesUtentes(T,I), mediaLista(I,R).
 mediaIdadeEspecialidade(E,R) :- solucoes(IDu, (prestador(IDp,_,E,_), cuidado(_,_,IDu,IDp,_,_)), S), apagaRepetidos(S,T), idadesUtentes(T,I), mediaLista(I,R).
+
+%Verifica se a data de um determinado cuidado está entre duas datas.
+verificaDataCuidado(D1,D2,Dc) :- dataMaior(D1,Dc,Dc),
+								 dataMaior(D2,Dc,D2).
+
+%Determina a lista dos utentes que requisitaram um cuidado de uma certa especialidade entre duas datas.
+utentesEspecialidadeDatas(E,D1,D2,S) :- solucoes((IDu,Nu), (prestador(IDp,_,E,_), cuidado(Dc,_,IDu,IDp,_,_), verificaDataCuidado(D1,D2,Dc), utente(IDu,Nu,_,_)), S).
+
+%Determina a lista dos utentes que consultaram um cuidado com determinado prestador entre duas datas.
+utentesPrestadorDatas(IDp,D1,D2,S) :- solucoes((IDu,Nu), (prestador(IDp,_,_,_), cuidado(Dc,_,IDu,IDp,_,_), verificaDataCuidado(D1,D2,Dc), utente(IDu,Nu,_,_)), S).
+
+%Determina a lista dos cuidados de uma determinada especialidade entre duas datas.
+cuidadosPorEspecialidadeDatas(E,D1,D2,S) :- solucoes((Dc,H), (prestador(IDp,_,E,_), cuidado(Dc,H,_,IDp,_,_), verificaDataCuidado(D1,D2,Dc)), S).
+
+%Determina a lista dos cuidados entre duas datas.
+cuidadosEntreDatas(D1,D2,S) :- solucoes((Dc,H), (cuidado(Dc,H,_,_,_,_), verificaDataCuidado(D1,D2,Dc)), S).
+
+
+
+
+
+
