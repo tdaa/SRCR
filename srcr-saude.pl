@@ -128,7 +128,7 @@ apagaT([X|T],Y,[X|R]) :- X \= Y, apagaT(T,Y,R).
 
 %Eliminar elementos repetidos de uma lista
 apagaRepetidos([],[]).
-apagaRepetidos([H|T],[H|R]) :- apagaT(H,T,L), apagaRepetidos(L,R).
+apagaRepetidos([H|T],[H|R]) :- apagaT(T,H,L), apagaRepetidos(L,R).
 
 %Identificar utentes por critérios de seleção
 identificaUtenteID(ID,N) :- utente(ID,N,I,M).
@@ -167,10 +167,10 @@ identificaUtenteCidade(L,R) :- solucoes((IDu,N,I,M), (instituicao(IDi,_,L), pres
 %Determinar todas as instituições/prestadores a que um utente já recorreu, devolvendo tambem a especialidade que procurou.
 identificaInstPrestIDU(IDu,R) :- solucoes((IDi,Ni,IDp,Nome,Esp), (cuidado(D,H,IDu,IDp,De,C), prestador(IDp, Nome, Esp, IDi), instituicao(IDi,Ni,L)), S), apagaRepetidos(S,R).
 
-%Determinar o custo total dos cuidados presentes numa lista
-somaCusto([],0).
-somaCusto([C],C).
-somaCusto([C|T],R) :- somaCusto(T,N), R is N+C.
+%Determinar a soma dos elementos de uma lista
+somaLista([],0).
+somaLista([C],C).
+somaLista([C|T],R) :- somaLista(T,N), R is N+C.
 
 %Determinar a maior entre duas datas
 dataMaior(Y1-M1-D1,Y2-M2-D2,Y2-M2-D2) :- Y2 > Y1; (Y2 == Y1, M2 > M1); (Y2 == Y1, M2 == M1, D2 >= D1).
@@ -189,37 +189,79 @@ custoInstituicao(IDi,N) :- solucoes(C, (cuidado(_,_,_,IDp,_,C), prestador(IDp,_,
 custoData(D,N) :- solucoes(C, cuidado(D,_,_,_,_,C), S), somaCusto(S,N).
 custoDatas(Di,Df,N) :- solucoes((D,C), cuidado(D,_,_,_,_,C), S), custoPorDatas(S,Di,Df,R), somaCusto(R,N).
 
-%Determinar o número de utentes/prestadores que receberem cuidados numa determinada instituição
-nrUtentesInstituicao(IDi,N) :- solucoes(IDu, (prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_), utente(IDu,N,I,M)), S), apagaRepetidos(S,R), comprimento(R,N).
+%Determinar o número de utentes/prestadores que receberam cuidados numa determinada instituição
+nrUtentesInstituicao(IDi,N) :- solucoes(IDu, (prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_)), S), apagaRepetidos(S,R), comprimento(R,N).
 nrPrestadoresInstituicao(IDi,N) :- solucoes(IDp, prestador(IDp,_,_,IDi), S), apagaRepetidos(S,R), comprimento(R,N).
+nrEspecialidadesInstituicao(IDi,N) :- solucoes(E, (prestador(IDp,_,E,IDi), cuidado(_,_,_,IDp,_,_)), S), apagaRepetidos(S,R), comprimento(R,N).
 
-%Predicados auxiliares para determinar o elemento mais repetido de uma lista
-quantidade(X,[],[(X,0)]).
-quantidade(X,[H|T],[(X,N)]) :- X == H, quantidade(X,T,[(X,G)]), N is G+1.
+%Determinar o número de utentes que receberam cuidados de um determinado prestador
+nrUtentesPrestador(IDp,N) :- solucoes(IDu, (prestador(IDp,_,_,_), cuidado(_,_,IDu,IDp,_,_)), S), apagaRepetidos(S,R), comprimento(R,N).
+
+%Determinar o número de vezes que um elemento aparece numa lista
+quantidade(X,[],(X,0)).
+quantidade(X,[H|T],(X,N)) :- X == H, quantidade(X,T,(X,G)), N is G+1.
 quantidade(X,[H|T],L) :- X \= H, quantidade(X,T,L).
 
-concatenar([],L,L).
-concatenar([X|T],L,[X|R]) :- concatenar(T,L,R).
-
+%Criar uma lista em que a cada elemento está associado o número de vezes que este aparece numa lista inicial
 listaTuplos([],[]).
-listaTuplos([H|T],R) :- quantidade(H,[H|T],L), apagaT([H|T],H,Q), listaTuplos(Q,F), concatenar(L,F,R).
+listaTuplos([H|T],[L|R]) :- quantidade(H,[H|T],L), apagaT([H|T],H,Q), listaTuplos(Q,R).
 
-paresMaiores([],[]).
-paresMaiores([(X,Y)],[(X,Y)]).
-paresMaiores([(X,Y)|T],[(X,Y),(W,Z)|R]) :- paresMaiores(T, [(W,Z)|R]), Y == Z.
-paresMaiores([(X,Y)|T],[(W,Z)|R]) :- paresMaiores(T,[(W,Z)|R]), Y < Z.
-paresMaiores([(X,Y)|T],[(X,Y)]) :- paresMaiores(T,[(W,Z)|R]), Y > Z.
+%Determinar o tuplo da lista com maior valor
+maiorElemento([(X,Y)],(X,Y)).
+maiorElemento([(X,Y),(W,Z)|T],R) :- Y >= Z, maiorElemento([(X,Y)|T], R).
+maiorElemento([(X,Y),(W,Z)|T],R) :- Y < Z, maiorElemento([(W,Z)|T], R).
 
-eliminaTuplos([],[]).
-eliminaTuplos([(X,Y)|T],[X|R]) :- eliminaTuplos(T,R).
+%Determinar os N maiores elementos de uma lista
+topN([],N,[]).
+topN(L,0,[]).
+topN(L,N,[X|R]) :- maiorElemento(L,(X,Y)), apagaT(L,(X,Y),S), M is N-1, topN(S,M,R).
 
+%Associar a cada ID de prestador o seu nome
 nomesPrestadores([],[]).
-nomesPrestadores([IDp|T],[(IDp,N)|R]) :- prestador(IDp,N,_,_), nomesPrestadores(T,R).
+nomesPrestadores([ID|T],[(ID,N)|R]) :- prestador(ID,N,_,_), nomesPrestadores(T,R).
 
+%Associar a cada ID de instituição o seu nome
 nomesInstituicoes([],[]).
-nomesInstituicoes([IDi|T],[(IDi,N)|R]) :- instituicao(IDi,N,_,_), nomesInstituicoes(T,R).
+nomesInstituicoes([ID|T],[(ID,N)|R]) :- instituicao(ID,N,_), nomesInstituicoes(T,R).
 
-%Determinar a especialidade/prestador/instituição mais ocorrente nos cuidados
-topEspecialidades(X) :- solucoes(E, (prestador(IDp,_,E,_), cuidado(_,_,_,IDp,_,_)), S), listaTuplos(S,R), paresMaiores(R,F), eliminaTuplos(F,X).
-topPrestadores(N) :- solucoes(IDp, cuidado(_,_,_,IDp,_,_), S), listaTuplos(S,R), paresMaiores(R,F), eliminaTuplos(F,X), nomesPrestadores(X,N).
-topInstituicoes(N) :- solucoes(IDi, (prestador(IDp,_,_,IDi), cuidado(_,_,_,IDp,_,_)), S), listaTuplos(S,R), paresMaiores(R,F), eliminaTuplos(F,X), nomesInstituicoes(X,N).
+%Determinar o top N de especialidades/prestadores/instituições mais ocorrentes nos cuidados
+topNEspecialidades(N,R) :- solucoes(E, (prestador(IDp,_,E,_), cuidado(_,_,_,IDp,_,_)), S), listaTuplos(S,T), topN(T,N,R).
+topNPrestadores(N,R) :- solucoes(IDp, (prestador(IDp,_,_,_), cuidado(_,_,_,IDp,_,_)), S), listaTuplos(S,T), topN(T,N,X), nomesPrestadores(X,R).
+topNInstituicoes(N,R) :- solucoes(IDi, (prestador(IDp,_,_,IDi), cuidado(_,_,_,IDp,_,_)), S), listaTuplos(S,T), topN(T,N,X), nomesInstituicoes(X,R).
+
+%Eliminar os tuplos de uma lista que tem como primeiro elemento um determinado X
+apagaTuplos([],R,[]).
+apagaTuplos([(X,Y)|T],X,R) :- apagaTuplos(T,X,R).
+apagaTuplos([(X,Y)|T],N,[(X,Y)|R]) :- X \= N, apagaTuplos(T,N,R).
+
+%Determinar a soma dos custos associados a determinado elemento
+custoElemento(X,[],0).
+custoElemento(X,[(X,Z)|T],R) :- custoElemento(X,T,G), R is G+Z.
+custoElemento(X,[(Y,Z)|T],R) :- X \= Z, custoElemento(X,T,R).
+
+%Determinar a soma dos custos associados a cada elemento da lista
+custoTuplos([],[]).
+custoTuplos([(X,Y)|T],[(X,C)|R]) :- custoElemento(X,[(X,Y)|T],C), apagaTuplos([(X,Y)|T],X,L), custoTuplos(L,R).
+
+%Determinar as N especialidades/instituições mais lucrativas
+especialidadesMaisLucrativas(N,R) :- solucoes((E,C), (prestador(IDp,_,E,_), cuidado(_,_,_,IDp,_,C)), S), custoTuplos(S,T), topN(T,N,R).
+instituicoesMaisLucrativas(N,R) :- solucoes((Ni,C), (instituicao(IDi,Ni,_), prestador(IDp,_,_,IDi), cuidado(_,_,_,IDp,_,C)), S), custoTuplos(S,T), topN(T,N,R).
+
+%Associar a cada ID de utente o seu nome
+nomesUtentes([],[]).
+nomesUtentes([ID|T],[(ID,N)|R]) :- utente(ID,N,_,_), nomesUtentes(T,R).
+
+%Determinar os N utentes que mais dinheiro gastam em determinada instituição
+utentesMaiorCustoInst(IDi,N,R) :- solucoes((IDu,C), (prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,C)), S), custoTuplos(S,T), topN(T,N,X), nomesUtentes(X,R).
+
+%Determinar a média dos elementos de uma lista
+mediaLista(L,M) :- somaLista(L,S), comprimento(L,T), M is S/T.
+
+%Substituir o ID de utente pela sua idade
+idadesUtentes([],[]).
+idadesUtentes([ID|T],[I|R]) :- utente(ID,_,I,_), idadesUtentes(T,R).
+
+%Determinar a média das idades dos utentes geral/por instituição/por especialidade
+mediaIdadeGeral(R) :- solucoes(I, utente(_,_,I,_), S), mediaLista(S,R).
+mediaIdadeInstituicao(IDi,R) :- solucoes(IDu, (prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_)), S), apagaRepetidos(S,T), idadesUtentes(T,I), mediaLista(I,R).
+mediaIdadeEspecialidade(E,R) :- solucoes(IDu, (prestador(IDp,_,E,_), cuidado(_,_,IDu,IDp,_,_)), S), apagaRepetidos(S,T), idadesUtentes(T,I), mediaLista(I,R).
