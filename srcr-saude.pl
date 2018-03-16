@@ -95,7 +95,15 @@ cuidado(2018-9-30, 11:00, 3, 5, stress, 30).
 					      L =< 1
 					     ).
 
+%Invariante Referencial: verificar se já existe instituicao a que um determinado prestador está associado.
+
++prestador(ID,N,E,I) :: (solucoes(I, instituicao(I,_,_), S),
+						comprimento(S,L),
+						L==1
+						).
+
 %Invariante Referencial: não permitir a inserção de cuidados com a mesma data e hora para o mesmo utente ou para o mesmo prestador
+% e verificar se utente e prestador já existem na base de conhecimento.
 
 +cuidado(D,H,IdU,IdP,DC,C)  :: (solucoes((D,H,IdU), cuidado(D,H,IdU,X,Y,Z), S),
 					    		comprimento(S,L),
@@ -106,6 +114,16 @@ cuidado(2018-9-30, 11:00, 3, 5, stress, 30).
 					    		comprimento(S,L),
 					    		L =< 1
 					    	   ).
+
++cuidado(D,H,IDu,IDp,DC,C) :: (solucoes(IDu, utente(IDu,_,_,_), S),
+							   comprimento(S,L),
+							   L==1
+							   ).
+
++cuidado(D,H,IdU,Idp,DC,C) :: (solucoes(IDp, prestador(IDp,_,_,_), S),
+							   comprimento(S,L),
+							   L==1
+							   ).
 
 %Invariante Referencial: não permitir a remoção de conhecimento que esteja a ser utilizado
 -utente(ID,N,I,M) :: (solucoes( ID, cuidado(A,H,ID,IDp,D,C), S),
