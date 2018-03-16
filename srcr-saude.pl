@@ -143,6 +143,7 @@ identificaPrestadorID(ID,N) :- prestador(ID,N,E,IDi).
 identificaPrestadorNome(N,S) :- solucoes((ID,N), prestador(ID,N,E,IDi), S).
 identificaPrestadorEsp(E,S) :- solucoes((ID,N), prestador(ID,N,E,IDi), S).
 identificaPrestadorIDinst(IDi,S) :- solucoes((ID,N), prestador(ID,N,E,IDi), S).
+identificaPrestadorLocal(L,S) :- solucoes((ID,N), (prestador(ID,N,_,IDi), instituicao(IDi,_,L)), S).
 
 %Identificar as instituições prestadoras de cuidados de saúde por critérios de seleção
 identificaInstID(ID,N) :- instituicao(ID,N,L).
@@ -175,12 +176,8 @@ somaLista([C],C).
 somaLista([C|T],R) :- somaLista(T,N), R is N+C.
 
 %Determinar a maior entre duas datas
-dataMaior(Y1-M1-D1,Y2-M2-D2,Y2-M2-D2) :- Y2 > Y1. 
-dataMaior(Y1-M1-D1,Y2-M2-D2,Y2-M2-D2) :- Y2 == Y1, M2 > M1.
-dataMaior(Y1-M1-D1,Y2-M2-D2,Y2-M2-D2) :- Y2 == Y1, M2 == M1, D2 >= D1.
-dataMaior(Y1-M1-D1,Y2-M2-D2,Y1-M1-D1) :- Y2 < Y1.
-dataMaior(Y1-M1-D1,Y2-M2-D2,Y1-M1-D1) :- Y2 == Y1, M2 < M1.
-dataMaior(Y1-M1-D1,Y2-M2-D2,Y1-M1-D1) :- Y2 == Y1, M2 == M1, D2 < D1.
+dataMaior(Y1-M1-D1,Y2-M2-D2,Y2-M2-D2) :- Y2 > Y1; (Y2 == Y1, M2 > M1); (Y2 == Y1, M2 == M1, D2 >= D1).
+dataMaior(Y1-M1-D1,Y2-M2-D2,Y1-M1-D1) :- Y2 < Y1; (Y2 == Y1, M2 < M1); (Y2 == Y1, M2 == M1, D2 < D1).
 
 %Determinar lista de custos ocorridos entre determinadas datas
 custoPorDatas([(D,C)],Di,Df,[]) :- \+dataMaior(Di,D,D); \+dataMaior(D,Df,Df).
@@ -288,8 +285,5 @@ cuidadosPorEspecialidadeDatas(E,D1,D2,S) :- solucoes((Dc,H), (prestador(IDp,_,E,
 %Determina a lista dos cuidados entre duas datas.
 cuidadosEntreDatas(D1,D2,S) :- solucoes((Dc,H), (cuidado(Dc,H,_,_,_,_), verificaDataCuidado(D1,D2,Dc)), S).
 
-
-
-
-
-
+%Determina a lista dos prestadores que realizaram cuidados entre duas datas.
+prestadoresCuidadosEntreDatas(D1,D2,S) :- solucoes((IDp,Np), (prestador(IDp,Np,_,_), cuidado(Dc,_,_,IDp,_,_), verificaDataCuidado(D1,D2,Dc)), S).
