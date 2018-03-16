@@ -61,6 +61,7 @@ prestador(1, tania_fernandes, psiquiatria, 3).
 prestador(2, mario_oliveira, clinicaGeral, 2).
 prestador(3, filipa_ferreira, pediatria, 1).
 prestador(4, joao_machado, dermatologia, 2).
+prestador(5, andre_correia, psiquiatria, 4).
 
 %Extensão do predicado instituicao: #IdInst, Designacao, Localidade -> {V,F}
 
@@ -75,6 +76,7 @@ cuidado(2018-4-10, 16:00, 2, 1, ansiedade, 4).
 cuidado(2018-5-16, 9:00, 2, 4, alergia_na_pele, 60).
 cuidado(2018-6-2, 15:30, 3, 3, checkup, 10).
 cuidado(2018-10-20, 10:45, 1, 4, acne, 60).
+cuidado(2018-9-30, 11:00, 3, 5, stress, 30).
 
 %Invariante Estrutural: não permitir a inserção de conhecimento repetido
 
@@ -93,7 +95,15 @@ cuidado(2018-10-20, 10:45, 1, 4, acne, 60).
 					      L =< 1
 					     ).
 
+%Invariante Referencial: verificar se já existe instituicao a que um determinado prestador está associado.
+
++prestador(ID,N,E,I) :: (solucoes(I, instituicao(I,_,_), S),
+						comprimento(S,L),
+						L==1
+						).
+
 %Invariante Referencial: não permitir a inserção de cuidados com a mesma data e hora para o mesmo utente ou para o mesmo prestador
+% e verificar se utente e prestador já existem na base de conhecimento.
 
 +cuidado(D,H,IdU,IdP,DC,C)  :: (solucoes((D,H,IdU), cuidado(D,H,IdU,X,Y,Z), S),
 					    		comprimento(S,L),
@@ -104,6 +114,16 @@ cuidado(2018-10-20, 10:45, 1, 4, acne, 60).
 					    		comprimento(S,L),
 					    		L =< 1
 					    	   ).
+
++cuidado(D,H,IDu,IDp,DC,C) :: (solucoes(IDu, utente(IDu,_,_,_), S),
+							   comprimento(S,L),
+							   L==1
+							   ).
+
++cuidado(D,H,IdU,Idp,DC,C) :: (solucoes(IDp, prestador(IDp,_,_,_), S),
+							   comprimento(S,L),
+							   L==1
+							   ).
 
 %Invariante Referencial: não permitir a remoção de conhecimento que esteja a ser utilizado
 -utente(ID,N,I,M) :: (solucoes( ID, cuidado(A,H,ID,IDp,D,C), S),
@@ -141,6 +161,7 @@ identificaPrestadorID(ID,N) :- prestador(ID,N,E,IDi).
 identificaPrestadorNome(N,S) :- solucoes((ID,N), prestador(ID,N,E,IDi), S).
 identificaPrestadorEsp(E,S) :- solucoes((ID,N), prestador(ID,N,E,IDi), S).
 identificaPrestadorIDinst(IDi,S) :- solucoes((ID,N), prestador(ID,N,E,IDi), S).
+identificaPrestadorLocal(L,S) :- solucoes((ID,N), (prestador(ID,N,_,IDi), instituicao(IDi,_,L)), S).
 
 %Identificar as instituições prestadoras de cuidados de saúde por critérios de seleção
 identificaInstID(ID,N) :- instituicao(ID,N,L).
@@ -265,3 +286,22 @@ idadesUtentes([ID|T],[I|R]) :- utente(ID,_,I,_), idadesUtentes(T,R).
 mediaIdadeGeral(R) :- solucoes(I, utente(_,_,I,_), S), mediaLista(S,R).
 mediaIdadeInstituicao(IDi,R) :- solucoes(IDu, (prestador(IDp,_,_,IDi), cuidado(_,_,IDu,IDp,_,_)), S), apagaRepetidos(S,T), idadesUtentes(T,I), mediaLista(I,R).
 mediaIdadeEspecialidade(E,R) :- solucoes(IDu, (prestador(IDp,_,E,_), cuidado(_,_,IDu,IDp,_,_)), S), apagaRepetidos(S,T), idadesUtentes(T,I), mediaLista(I,R).
+
+%Verifica se a data de um determinado cuidado está entre duas datas.
+verificaDataCuidado(D1,D2,Dc) :- dataMaior(D1,Dc,Dc),
+								 dataMaior(D2,Dc,D2).
+
+%Determina a lista dos utentes que requisitaram um cuidado de uma certa especialidade entre duas datas.
+utentesEspecialidadeDatas(E,D1,D2,S) :- solucoes((IDu,Nu), (prestador(IDp,_,E,_), cuidado(Dc,_,IDu,IDp,_,_), verificaDataCuidado(D1,D2,Dc), utente(IDu,Nu,_,_)), S).
+
+%Determina a lista dos utentes que consultaram um cuidado com determinado prestador entre duas datas.
+utentesPrestadorDatas(IDp,D1,D2,S) :- solucoes((IDu,Nu), (prestador(IDp,_,_,_), cuidado(Dc,_,IDu,IDp,_,_), verificaDataCuidado(D1,D2,Dc), utente(IDu,Nu,_,_)), S).
+
+%Determina a lista dos cuidados de uma determinada especialidade entre duas datas.
+cuidadosPorEspecialidadeDatas(E,D1,D2,S) :- solucoes((Dc,H), (prestador(IDp,_,E,_), cuidado(Dc,H,_,IDp,_,_), verificaDataCuidado(D1,D2,Dc)), S).
+
+%Determina a lista dos cuidados entre duas datas.
+cuidadosEntreDatas(D1,D2,S) :- solucoes((Dc,H), (cuidado(Dc,H,_,_,_,_), verificaDataCuidado(D1,D2,Dc)), S).
+
+%Determina a lista dos prestadores que realizaram cuidados entre duas datas.
+prestadoresCuidadosEntreDatas(D1,D2,S) :- solucoes((IDp,Np), (prestador(IDp,Np,_,_), cuidado(Dc,_,_,IDp,_,_), verificaDataCuidado(D1,D2,Dc)), S).
