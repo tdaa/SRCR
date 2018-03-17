@@ -99,7 +99,6 @@ cuidado(2018-11-5, 11:00, 7, 2, rotina, 70).
 cuidado(2018-11-27, 13:45, 6, 9, miopia, 55).
 cuidado(2018-12-4, 12:00, 8, 8, dores_de_cabeca, 4).
 
-
 %Invariante Estrutural: não permitir a inserção de conhecimento repetido
 
 +utente(ID,N,I,M)  :: (solucoes(ID, utente(ID,X,Y,Z), S),
@@ -163,6 +162,7 @@ cuidado(2018-12-4, 12:00, 8, 8, dores_de_cabeca, 4).
 						 comprimento(S,L),
 						 L==0
 					   	).
+
 
 %----------PREDICADOS AUXILIARES----------
 
