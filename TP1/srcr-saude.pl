@@ -42,9 +42,9 @@ evolucao(Termo) :- solucoes(Inv, +Termo :: Inv, S),
 				   insere(Termo), 
 				   teste(S).
 
-%Extensão do predicado inevolucao
+%Extensão do predicado involucao
 
-inevolucao(Termo) :- solucoes(Inv, -Termo :: Inv, S),
+involucao(Termo) :- solucoes(Inv, -Termo :: Inv, S),
                      remove(Termo),
     				 teste(S).
 
