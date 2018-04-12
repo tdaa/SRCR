@@ -96,31 +96,31 @@ demoLista([Q1|T],[R1|R]) :- demo(Q1,R1), demoLista(T,R).
 
 %Extensão do predicado utente: #IdUt, Nome, Idade, Morada, AnoAtualização -> {V,F}
 
-utente(1, tiago_alves, 20, vila_verde, 2018).
+utente(1, tiago_alves, xpto1, vila_verde, 2018).
 utente(2, isabel_pereira, 21, vila_verde, 2017).
-utente(3, francisco_matos, 16, tenoes,2010).
+utente(3, francisco_matos, 16, xpto7,2010).
 utente(4, maria_teixeira, 21, gondizalves, 2011).
-utente(5, rita_pereira, 45, braga, 2016).
-utente(6, antonio_silva, 33, guimaraes, 2009).
-utente(7, mario_duarte, 64, gualtar, 1987).
-utente(8, helena_dias, 75, amares, 1997).
-utente(9, sara_pires, 6, povoa_de_lanhoso, 2016).
-utente(10, hugo_antunes, 83, esposende,2008).
+utente(5, rita_pereira, 45, xpto7, 2016).
+utente(6, antonio_silva, xpto12, xpto13, 2009).
+utente(7, mario_duarte, xpto6, gualtar, 1987).
+utente(8, helena_dias, xpto6, amares, 1997).
+utente(9, sara_pires, 6, xpto2, 2016).
+utente(10, hugo_antunes, 83, xpto2,2008).
 
 %Extensão do predicado prestador: #IdPres, Nome, Especialidade, #IdInst, AnoAtualização -> {V,F}
 
-prestador(1, tania_fernandes, psiquiatria, 3, 2012).
+prestador(1, tania_fernandes, psiquiatria, xpto3, 2012).
 prestador(2, mario_oliveira, clinica_geral, 2, 2010).
-prestador(3, filipa_ferreira, pediatria, 1, 2017).
+prestador(3, filipa_ferreira, pediatria, xpto3, 2017).
 prestador(4, joao_machado, dermatologia, 2, 2014).
-prestador(5, andre_correia, psiquiatria, 4, 2016).
-prestador(6, renato_torres, pediatria, 4, 2018).
+prestador(5, andre_correia, psiquiatria, xpto8, 2016).
+prestador(6, renato_torres, pediatria, xpto8, 2018).
 prestador(7, andreia_silva, cardiologia, 4, 2017).
-prestador(8, andre_fernandes, neurologia, 2, 2016).
-prestador(9, filipe_alves, oftalmologia, 3, 2001).
+prestador(8, andre_fernandes, neurologia, xpto8, 2016).
+prestador(9, filipe_alves, oftalmologia, xpto8, 2001).
 prestador(10, julio_goncalves, urologia, 1, 2018).
 prestador(11, goncalo_matos, ginecologia, 1, 2010).
-prestador(12, filipe_alves, clinica_geral, 2,2017).
+prestador(12, filipe_alves, clinica_geral, xpto8,2017).
 
 %Extensão do predicado instituicao: #IdInst, Designacao, Localidade -> {V,F}
 
@@ -132,44 +132,30 @@ instituicao(5, hospital_da_senhora_da_oliveira, guimaraes).
 
 %Extensão do predicado cuidado: data, hora, #IdUt, #IdPrest, Descricao, Custo -> {V,F}
 
-cuidado(2018-4-10, 16:00, 2, 1, ansiedade, 4).
-cuidado(2018-4-11, 17:00, 5, 7, rotina, 45).
-cuidado(2018-5-16, 9:00, 2, 4, alergia_na_pele, 60).
-cuidado(2018-5-30, 9:00, 2, 4, alergia_na_pele, 60).
-cuidado(2018-6-2, 15:30, 3, 3, checkup, 10).
-cuidado(2018-9-30, 11:00, 3, 5, stress, 30).
+cuidado(2018-4-10, 16:00, xpto11, 1, ansiedade, 4).
+cuidado(2018-4-11, 17:00, 5, 7, xpto4, 45).
+cuidado(2018-5-16, 9:00, 2, 4, alergia_na_pele, xpto10).
+cuidado(2018-5-30, 9:00, 2, 4, xpto4, 60).
+cuidado(2018-6-2, 15:30, 3, 3, xpto9, 10).
+cuidado(2018-9-30, 11:00, 3, 5, xpto21, xpto22).
 cuidado(2018-10-20, 10:45, 1, 4, acne, 60).
-cuidado(2018-10-22, 14:25, 10, 10, infecao, 5).
-cuidado(2018-11-5, 11:30, 4, 11, ecografia, 35).
-cuidado(2018-11-5, 11:00, 7, 2, rotina, 70).
+cuidado(2018-10-22, 14:25, xpto14, 10, xpto15, 5).
+cuidado(2018-11-5, 11:30, xpto16, 11, ecografia, xpto17).
+cuidado(2018-11-5, 11:00, xpto18, 2, xpto19, xpto20).
 cuidado(2018-11-27, 13:45, 6, 9, miopia, 55).
-cuidado(2018-12-4, 12:00, 8, 8, dores_de_cabeca, 4).
+cuidado(2018-12-4, 12:00, 8, 8, xpto21, xpto22).
 
-%Extensão do predicado negativo utente: #IdUt, Nome, Idade, Morada, AnoAtualização -> {V,F}
+%Extensão do predicado que define a negação forte do utente: #IdUt, Nome, Idade, Morada, AnoAtualização -> {V,F}
 -utente(ID,N,I,M,A) :- nao(utente(ID,N,I,M,A)), nao(excecao(utente(ID,N,I,M,A))).
 
-%Extensão do predicado negativo prestador: #IdPres, Nome, Especialidade, #IdInst, AnoAtualização -> {V,F}
+%Extensão do predicado que define a negação forte do prestador: #IdPres, Nome, Especialidade, #IdInst, AnoAtualização -> {V,F}
 -prestador(ID,N,E,IDi,A) :- nao(prestador(ID,N,E,IDi,A)), nao(excecao(prestador(ID,N,E,IDi,A))).
 
-%Extensão do predicado negativo instituicao: #IdInst, Designacao, Localidade -> {V,F}
+%Extensão do predicado que define a negação forte da instituicao: #IdInst, Designacao, Localidade -> {V,F}
 -instituicao(ID,N,M) :- nao(instituicao(ID,N,M)), nao(excecao(instituicao(ID,N,M))).
 
-%Extensão do predicado negativo cuidado: Data, Hora, IdentificadorUtente, IdentificadorPrestador, Descrição, Custo -> {V,F}
+%Extensão do predicado que define a negação forte do cuidado: Data, Hora, IdentificadorUtente, IdentificadorPrestador, Descrição, Custo -> {V,F}
 -cuidado(D,H,IDu,IDp,Ds,C) :- nao(cuidado(D,H,IDu,IDp,Ds,C)), nao(excecao(cuidado(D,H,IDu,IDp,Ds,C))).
-
-%Invariante Estrutural: não permitir a inserção de conhecimento repetido
-
-+instituicao(ID,D,C)  :: (solucoes(ID, instituicao(ID,X,Y), S),
-					      comprimento(S,L),
-					      L =< 1
-					     ).
-
-%Invariante Referencial: não permitir a remoção de conhecimento que esteja a ser utilizado
-
--instituicao(ID,N,M) :: (solucoes( ID, prestador(IDp,Np,E,ID), S),
-						 comprimento(S,L),
-						 L==0
-					   	).
 
 %Nulos interditos sobre a idade e a morada dos utentes e os respetivos Invariantes
 nulo_utente_idade(xpto1).
@@ -188,7 +174,7 @@ excecao(utente(Id,N,I,M,A)) :- utente(Id,N,I,xpto2,A).
 						L==0
 					   ).
 
-%Nulos interditos sobre a especialidade dos prestadores e os respetivos Invariantes
+%Nulos interditos sobre o identificador da intituição dos prestadores e os respetivos Invariantes
 nulo_prestador_idInst(xpto3).
 excecao(prestador(Id,N,E,Idi,A)) :- prestador(Id,N,E,xpto3,A).
 
@@ -214,15 +200,55 @@ excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,IDu,IDp,Ds,xpto5).
 							   L==0
 					   		  ).
 
-%Conhecimento Incerto sobre a idade e a morada dos utentes
+%Conhecimento incerto sobre a idade e a morada de um utente
 excecao(utente(Id,N,I,M,A)) :- utente(Id,N,xpto6,M,A).
-
 excecao(utente(Id,N,I,M,A)) :- utente(Id,N,I,xpto7,A).
+excecao(utente(Id,N,I,M,A)) :- utente(Id,N,xpto12,xpto13,A).
 
+%Conhecimento incerto sobre o identificador da instituição de um prestador
 excecao(prestador(Id,N,E,Idi,A)) :- prestador(Id,N,E,xpto8,A).
 
+%Conhecimento incerto sobre a descricao, o custo e o identificador do utente dos cuidados
 excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,IDu,IDp,xpto9,C).
-
 excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,IDu,IDp,Ds,xpto10).
+excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,xpto11,IDp,Ds,C).
+excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,xpto14,IDp,xpto15,C).
+excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,xpto16,IDp,Ds,xpto17).
+excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,xpto18,IDp,xpto19,xpto20).
+excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,IDu,IDp,xpto21,xpto22).
 
-excecao(cuidad(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,xpto11,IDp,Ds,C).
+%Invariante Estrutural: não permitir a inserção de conhecimento repetido
+
++instituicao(ID,D,C)  :: (solucoes(ID, instituicao(ID,X,Y), S),
+					      comprimento(S,L),
+					      L =< 1
+					     ).
+
+%Invariante Referencial: não permitir a remoção de conhecimento que esteja a ser utilizado
+
+-utente(ID,N,I,M) :: (solucoes( ID, cuidado(A,H,ID,IDp,D,C), S),
+					  comprimento(S,L),
+					  L==0
+					 ).
+
+-prestador(ID,N,E,IDi) :: (solucoes( ID, cuidado(A,H,IDu,ID,D,C), S),
+						   comprimento(S,L),
+						   L==0
+					   	  ).
+
+-instituicao(ID,N,M) :: (solucoes( ID, prestador(IDp,Np,E,ID), S),
+						 comprimento(S,L),
+						 L==0
+					   	).
+
+%Invariante Referencial: verificar se utente e prestador existem na base de conhecimento, caso contrário não é permitida a adição do cuidado
+
++cuidado(D,H,IDu,IDp,DC,C) :: (solucoes(IDu, utente(IDu,_,_,_), S),
+							   comprimento(S,L),
+							   L==1
+							   ).
+
++cuidado(D,H,IdU,Idp,DC,C) :: (solucoes(IDp, prestador(IDp,_,_,_), S),
+							   comprimento(S,L),
+							   L==1
+							   ).
