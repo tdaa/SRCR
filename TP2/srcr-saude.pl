@@ -99,13 +99,17 @@ demoLista([Q1|T],[R1|R]) :- demo(Q1,R1), demoLista(T,R).
 utente(1, tiago_alves, xpto1, vila_verde, 2018).
 utente(2, isabel_pereira, 21, vila_verde, 2017).
 utente(3, francisco_matos, 16, xpto7,2010).
+utente_incerto(3).
 utente(4, maria_teixeira, 21, gondizalves, 2011).
 utente(5, rita_pereira, 45, xpto7, 2016).
+utente_incerto(5).
 utente(6, antonio_silva, xpto12, xpto13, 2009).
+utente_incerto(6).
 utente(7, mario_duarte, xpto6, gualtar, 1987).
-utente(8, helena_dias, xpto6, amares, 1997).
+utente_incerto(7).
+utente(8, helena_dias, 19, amares, 1997).
 utente(9, sara_pires, 6, xpto2, 2016).
-utente(10, hugo_antunes, 83, xpto2,2008).
+utente(10, hugo_antunes, 83, xpto2, 2008).
 
 %Extensão do predicado prestador: #IdPres, Nome, Especialidade, #IdInst, AnoAtualização -> {V,F}
 
@@ -114,13 +118,17 @@ prestador(2, mario_oliveira, clinica_geral, 2, 2010).
 prestador(3, filipa_ferreira, pediatria, xpto3, 2017).
 prestador(4, joao_machado, dermatologia, 2, 2014).
 prestador(5, andre_correia, psiquiatria, xpto8, 2016).
+prestador_incerto(5).
 prestador(6, renato_torres, pediatria, xpto8, 2018).
+prestador_incerto(6).
 prestador(7, andreia_silva, cardiologia, 4, 2017).
 prestador(8, andre_fernandes, neurologia, xpto8, 2016).
+prestador_incerto(8).
 prestador(9, filipe_alves, oftalmologia, xpto8, 2001).
 prestador(10, julio_goncalves, urologia, 1, 2018).
 prestador(11, goncalo_matos, ginecologia, 1, 2010).
 prestador(12, filipe_alves, clinica_geral, xpto8,2017).
+prestador_incerto(12).
 
 %Extensão do predicado instituicao: #IdInst, Designacao, Localidade -> {V,F}
 
@@ -252,3 +260,14 @@ excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,IDu,IDp,xpto21,xpto22).
 							   comprimento(S,L),
 							   L==1
 							   ).
+
+%COMENTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
+acima1ano(D,DS) :- D-DS >= 1.
+
+acima4anos(D,Ds) :- D-Ds >= 4.
+
+utentesAnomalias(S) :- solucoes((ID,N,I,M,D), (utente(ID,N,I,M,D), (utente_incerto(ID); utente_impreciso(ID); nulo_utente_idade(ID); nulo_utente_morada(M))), S).
+
+prestadoresAnomalias(S) :- solucoes((ID,N,E,IDi,D), (prestador(ID,N,E,IDi,D), (prestador_incerto(ID); prestador_impreciso(ID); nulo_prestador_idInst(IDi))),S).
+
+%cuiddosAnomaliasUtente(IDu,S) :- COMPLETAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
