@@ -1,17 +1,15 @@
 FALTA:
 
-- adicionar conhecimento impreciso nos utentes, prestadores e cuidados
-
-- decidir como identificar conhecimento incerto e impreciso nos cuidados
-
-- acabar predicado que indica anomalias nos cuidados de determinado utente (talvez fazer o mesmo para prestador)
-
-- criar invariantes/evolucao para atualizar conhecimento positivo (predicados das datas já criados)
-
-- criar invariantes/evolucao para atualizar conhecimento negativo (predicados das datas já criados)
-
 - criar invariantes/evolucao para atualizar conhecimento incerto
 
-- falar melhor sobre a atualização de conhecimento impreciso (acho que deve ser aceite na mesma conhecimento impreciso, senão só conseguimos adicionar um, ou então criar evolução para lista (alternativa mais complicada penso))
 
-- criar invariantes/evolucao para atualizar conhecimento impreciso
+
+NOTA: lembrar que o conhecimendo interdito ficou com todas as possibilidades
+
+
+JUST MAYBE:
+
+- acabar predicados:
+cuiddosAnomaliasUtente(IDu,S) :- 
+
+cuidadosAnomaliasPrestador(IDp,S) :- 
