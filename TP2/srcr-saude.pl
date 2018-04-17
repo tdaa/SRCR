@@ -8,10 +8,11 @@
 %Definições iniciais
 
 :- op(900, xfy, '::').
-:- op(996, xfy, '&&').
-:- op(997, xfy, '##').
-:- op(998, xfy, '~').
-:- op(999, xfy, '^').
+:- op(995, xfy, '&&').
+:- op(996, xfy, '##').
+:- op(997, xfy, '~').
+:- op(998, xfy, '^').
+:- op(999, xfy, '*').
 :- dynamic '-'/1.
 :- dynamic excecao/1.
 :- dynamic utente/5.
@@ -27,71 +28,6 @@
 :- dynamic cuidado_impreciso_preco/3.
 :- dynamic cuidado_impreciso_descricao/3.
 :- dynamic cuidado_impreciso_idUt/3.
-
-%Extensão do predicado soluçes
-
-solucoes(X,Y,Z) :- findall(X,Y,Z).
-
-%Extensão do predicado comprimento
-
-comprimento(S,N) :- length(S,N).
-
-%Extensão do predicado teste
-
-teste([]).
-teste([R|L]) :- R, teste(L).
-
-%Extensão do predicado remover
-
-remove(P) :- retract(P).
-remove(P) :- assert(P), !, fail.
-
-%Extensão do predicado insere
-
-insere(P) :- assert(P).
-insere(P) :- retract(P), !, fail.
-
-%Extensão do meta-predicado demoLista: Lista_de_Questoes,Resposta -> {V,F}
-
-demoLista([],[]).
-demoLista([Q1|T],[R1|R]) :- demo(Q1,R1), demoLista(T,R).
-
-%Extensão do predicado conjuncao: Valor,Valor,Resposta -> {V,F}
-
-conjuncao(V1,V2,falso) :- V1 == falso; V2 == falso.
-conjuncao(verdadeiro,verdadeiro,verdadeiro).
-conjuncao(verdadeiro,desconhecido,desconhecido).
-conjuncao(desconhecido,V,desconhecido) :- V == desconhecido; V == verdadeiro.
-
-%Extensão do predicado disjuncao: Valor,Valor,Resposta -> {V,F}
-
-disjuncao(V1,V2,verdadeiro) :- V1 == verdadeiro; V2 = verdadeiro.
-disjuncao(falso,falso,falso).
-disjuncao(falso,desconhecido,desconhecido).
-disjuncao(desconhecido,V,desconhecido) :- V == desconhecido; V == falso.
-
-%Extensão do meta-predicado demoComp: Composicao_de_Questoes,Resposta -> {V,F}
-
-demoComp(Q1 && CQ, R) :- demo(Q1,R1), demoComp(CQ,R2), conjuncao(R1,R2,R).
-demoComp(Q1 ## CQ, R) :- demo(Q1,R1), demoComp(CQ,R2), disjuncao(R1,R2,R).
-demoComp(Q1, R) :- demo(Q1,R).
-
-%Extensão do meta-predicado demo: Questao,Resposta -> {V,F}
-
-demo(Questao,verdadeiro) :- Questao.
-demo(Questao,falso) :- -Questao.
-demo(Questao,desconhecido) :- nao(Questao), nao(-Questao).
-
-%Extensão do meta-predicado nao: Questao -> {V,F}
-
-nao( Questao ) :-
-    Questao, !, fail.
-nao( Questao ).
-
-%Extensão do meta-predicado demoLista: Lista_de_Questoes,Resposta -> {V,F}
-
-demoLista([],[]).
-demoLista([Q1|T],[R1|R]) :- demo(Q1,R1), demoLista(T,R).
 
 %Extensão do predicado utente: #IdUt, Nome, Idade, Morada, AnoAtualização -> {V,F}
 
@@ -261,19 +197,11 @@ excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,IDu,IDp,xpto21,xpto22).
 					      comprimento(S,L),
 					      L =< 1).
 
-%Invariante Referencial: não permitir a remoção de conhecimento que esteja a ser utilizado
+%Extensão do predicado evolucao que só é utilizado para a instituicao
 
--utente(ID,N,I,M,D) :: (solucoes( ID, cuidado(A,H,ID,IDp,D,C), S),
-					   comprimento(S,L),
-					   L==0).
-
--prestador(ID,N,E,IDi,D) :: (solucoes( ID, cuidado(A,H,IDu,ID,D,C), S),
-						    comprimento(S,L),
-						    L==0).
-
--instituicao(ID,N,M) :: (solucoes( ID, prestador(IDp,Np,E,ID), S),
-						 comprimento(S,L),
-						 L==0).
+evolucao(Termo) :- solucoes(Inv, +Termo :: Inv, S),
+				   insere(Termo), 
+				   teste(S).
 
 %Invariante Referencial: verificar se utente e prestador existem na base de conhecimento, caso contrário não é permitida a adição do cuidado
 
@@ -284,19 +212,6 @@ excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,IDu,IDp,xpto21,xpto22).
 +cuidado(D,H,IDu,IDp,DC,C) :: (solucoes(IDp, (prestador(IDp,_,_,_,_); (excecao(prestador(IDp,_,_,Idi,_)), Idi \= 8)), S),
 							   comprimento(S,L),
 							   L==1).
-
-%Extensão do predicado evolucao que só é utilizado para a instituicao
-
-evolucao(Termo) :- solucoes(Inv, +Termo :: Inv, S),
-				   insere(Termo), 
-				   teste(S).
-
-%Extensão do predicado involucao que pode ser utilizado para todos os predicados
-
-involucao(Termo) :- solucoes(Inv, -Termo :: Inv, S),
-      			    remove(Termo),
-					teste(S).
-
 
 +utente(ID,N,I,M,D) :: (solucoes(ID, (utente(ID,N,_,_,Ds), utente_perfeito(ID), abaixo1ano(D,Ds)),S),
 						comprimento(S,L),
@@ -462,6 +377,10 @@ evolucaoNegativa(cuidado(D,H,IDu,IDp,Ds,C)) :- solucoes(Inv, +(-cuidado(D,H,IDu,
 						  comprimento(S,L),
 						  L==0).
 
+~(utente(ID,N,I,M,D)) :: (solucoes(ID, excecao(utente(ID,N,I,M,D)), S),
+						  comprimento(S,L),
+						  L==1).
+
 ~(prestador(ID,N,E,IDi,D)) :: (solucoes(ID, (prestador(ID,_,_,IDs,_), IDs \= xpto8), S),
 							   comprimento(S,L),
 							   L==0).
@@ -473,6 +392,10 @@ evolucaoNegativa(cuidado(D,H,IDu,IDp,Ds,C)) :- solucoes(Inv, +(-cuidado(D,H,IDu,
 ~(prestador(ID,N,E,IDi,D)) :: (solucoes(ID, (prestador(ID,_,_,IDs,_), nulo_prestador_idInst(IDs)), S),
 							   comprimento(S,L),
 							   L==0).
+
+~(prestador(ID,N,E,IDi,D)) :: (solucoes(ID, excecao(prestador(ID,N,E,IDi,D)), S),
+							   comprimento(S,L),
+							   L==1).
 
 ~(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, (cuidado(D,H,IDus,IDp,Dss,Cs), 
 								 IDus \= xpto11, IDus \= xpto14, IDus \= xpto16, IDus \= xpto18,
@@ -491,6 +414,10 @@ evolucaoNegativa(cuidado(D,H,IDu,IDp,Ds,C)) :- solucoes(Inv, +(-cuidado(D,H,IDu,
 ~(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, (cuidado(D,H,_,IDp,_,Cs), nulo_cuidado_custo(Cs)), S),
 							     comprimento(S,L),
 							     L==0).
+
+~(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, excecao(cuidado(D,H,IDu,IDp,Ds,C)), S),
+							     comprimento(S,L),
+							     L==1).
 
 evolucaoImprecisa(utente(ID,N,I,M,D),T) :- solucoes(Inv, ~(utente(ID,N,I,M,D)) :: Inv, S),
 										   insere(excecao(utente(ID,N,I,M,D))),
@@ -582,23 +509,113 @@ evolucaoInterdita(cuidado(D,H,IDu,IDp,nulo,nulo)) :- solucoes(Inv, ^(cuidado(D,H
 										  	         removeIncerto(cuidado(D,H,_,IDp,_,_)),
 											         removePerfeito(cuidado(D,H,_,IDp,_,_)).
 
-%PREDICADOS EXTRA
+*(utente(ID,N,I,M,D)) :: (solucoes(ID, utente(ID,_,_,_,_), S),
+						  comprimento(S,L),
+						  L==1).
+
+*(utente(ID,N,I,M,D)) :: (solucoes(ID, -utente(ID,_,_,_,_), S),
+						  comprimento(S,L),
+						  L==0).
+
+*(utente(ID,N,I,M,D)) :: (solucoes(ID, (utente_impreciso_idade(ID); utente_impreciso_morada(ID)), S),
+						  comprimento(S,L),
+						  L==0).
+
+*(prestador(ID,N,E,IDi,D)) :: (solucoes(ID, prestador(ID,_,_,_,_), S),
+						  	   comprimento(S,L),
+						 	   L==1).
+
+*(prestador(ID,N,E,IDi,D)) :: (solucoes(ID, -prestador(ID,_,_,_,_), S),
+						  	   comprimento(S,L),
+						  	   L==0).
+
+*(prestador(ID,N,E,IDi,D)) :: (solucoes(ID, prestador_impreciso_idInst(ID), S),
+						  	   comprimento(S,L),
+						  	   L==0).
+
+*(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, cuidado(D,H,_,IDp,_,_), S),
+						  	     comprimento(S,L),
+						 	     L==1).
+
+*(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, -cuidado(D,H,_,IDp,_,_), S),
+						  	     comprimento(S,L),
+						  	     L==0).
+
+*(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, (cuidado_impreciso_idUt(D,H,IDp); cuidado_impreciso_descricao(D,H,IDp); cuidado_impreciso_preco(D,H,IDp)), S),
+						  	     comprimento(S,L),
+						  	     L==0).
+
+evolucaoIncerta(utente(ID,N,nulo,M,D)) :- solucoes(Inv, *(utente(ID,N,xpto6,M,D)) :: Inv, S),
+										  insere(utente(ID,N,xpto6,M,D)),
+										  teste(S).
+
+evolucaoIncerta(utente(ID,N,I,nulo,D)) :- solucoes(Inv, *(utente(ID,N,I,xpto7,D)) :: Inv, S),
+										  insere(utente(ID,N,I,xpto7,D)),
+										  teste(S).
+
+evolucaoIncerta(utente(ID,N,nulo,nulo,D)) :- solucoes(Inv, *(utente(ID,N,xpto12,xpto13,D)) :: Inv, S),
+										 	 insere(utente(ID,N,xpto12,xpto13,D)),
+										 	 teste(S).
+
+%Invariante Referencial: não permitir a remoção de conhecimento que esteja a ser utilizado
+
+-utente(ID,N,I,M,D) :: (solucoes(ID, (cuidado(Dt,H,ID,IDp,Ds,C); -cuidado(Dt,H,ID,IDp,Ds,C)) , S),
+					    comprimento(S,L),
+					    L==0).
+
+-utente(ID,N,I,M,D) :: (solucoes(ID, (excecao(cuidado(Dt,H,ID,IDp,Ds,C)), 
+						Ds == xpto9; Ds == xpto21; C == xpto11) , S),
+					    comprimento(S,L),
+					    L==0).
+
+-prestador(ID,N,E,IDi,D) :: (solucoes(ID, (cuidado(Dt,H,IDu,ID,Ds,C); -cuidado(Dt,H,IDu,ID,Ds,C)) , S),
+					         comprimento(S,L),
+					         L==0).
+
+-prestador(ID,N,E,IDi,D) :: (solucoes(ID, (excecao(cuidado(Dt,H,IDu,ID,Ds,C)),
+							 IDu == xpto11; IDu == xpto14; IDu == xpto16; IDu == xpto18; Ds == xpto9; Ds == xpto21; C == xpto11) , S),
+					         comprimento(S,L),
+					         L==0).
+
+-instituicao(ID,N,M) :: (solucoes(ID, (prestador(IDp,Np,E,ID); -prestador(IDp,Np,E,ID)), S),
+						 comprimento(S,L),
+						 L==0).
+
+%Extensão do predicado involucao que pode ser utilizado para todos os predicados
+
+involucao(Termo) :- solucoes(Inv, -Termo :: Inv, S),
+      			    remove(Termo),
+					teste(S).
+
+%PREDICADOS EXTRA LIGADOS ÀS EVOLUCOES
+
+%Extensão do predicado soluçes
+
+solucoes(X,Y,Z) :- findall(X,Y,Z).
+
+%Extensão do predicado comprimento
+
+comprimento(S,N) :- length(S,N).
+
+%Extensão do predicado teste
+
+teste([]).
+teste([R|L]) :- R, teste(L).
+
+%Extensão do predicado remover
+
+remove(P) :- retract(P).
+remove(P) :- assert(P), !, fail.
+
+%Extensão do predicado insere
+
+insere(P) :- assert(P).
+insere(P) :- retract(P), !, fail.
+
 
 abaixo1ano(D1,D2) :- (D1-D2) < 1.
 
 abaixo4anos(D1,D2) :- (D1-D2) < 4.
-
-utentesAnomalias(S) :- solucoes((ID,N,I,M,D), (utente(ID,N,I,M,D), 
-					   (utente_impreciso_idade(ID); utente_impreciso_morada(ID); 
-					   nulo_utente_idade(ID); nulo_utente_morada(M); 
-					   I == xpto6; I == xpto12; M == xpto7)), 
-					   S).
-
-prestadoresAnomalias(S) :- solucoes((ID,N,E,IDi,D), (prestador(ID,N,E,IDi,D),
-						   (prestador_impreciso_idInst(ID); 
-						   nulo_prestador_idInst(IDi);
-						   IDi == xpto8)),
-						   S).
 
 removeLista([]).
 removeLista([H|T]) :- retract(H), removeLista(T).
@@ -710,3 +727,75 @@ removeIncertoEspecifico(cuidado(D,H,_,IDp,_,_),dc) :- solucoes(cuidado(D,H,IDu,I
 removeIncertoEspecifico(cuidado(D,H,_,IDp,_,_),idudc) :- solucoes(cuidado(D,H,IDu,IDp,Ds,C), (cuidado(D,H,IDu,IDp,Ds,C), 
 													   (IDu == xpto11; IDu == xpto14; IDu == xpto16; IDu == xpto18; Ds == xpto9; Ds == xpto21; C == xpto10)), S),
 									 			 	   removeLista(S).
+
+
+
+%PREDICADOS DEMOS E RELACIONADOS
+
+%Extensão do meta-predicado nao: Questao -> {V,F}
+
+nao( Questao ) :-
+    Questao, !, fail.
+nao( Questao ).
+
+%Extensão do predicado conjuncao: Valor,Valor,Resposta -> {V,F}
+
+conjuncao(V1,V2,falso) :- V1 == falso; V2 == falso.
+conjuncao(verdadeiro,verdadeiro,verdadeiro).
+conjuncao(verdadeiro,desconhecido,desconhecido).
+conjuncao(desconhecido,V,desconhecido) :- V == desconhecido; V == verdadeiro.
+
+%Extensão do predicado disjuncao: Valor,Valor,Resposta -> {V,F}
+
+disjuncao(V1,V2,verdadeiro) :- V1 == verdadeiro; V2 = verdadeiro.
+disjuncao(falso,falso,falso).
+disjuncao(falso,desconhecido,desconhecido).
+disjuncao(desconhecido,V,desconhecido) :- V == desconhecido; V == falso.
+
+%Extensão do meta-predicado demo: Questao,Resposta -> {V,F}
+
+demo(Questao,verdadeiro) :- Questao.
+demo(Questao,falso) :- -Questao.
+demo(Questao,desconhecido) :- nao(Questao), nao(-Questao).
+
+%Extensão do meta-predicado demoLista: Lista_de_Questoes,Resposta -> {V,F}
+
+demoLista([],[]).
+demoLista([Q1|T],[R1|R]) :- demo(Q1,R1), demoLista(T,R).
+
+%Extensão do meta-predicado demoComp: Composicao_de_Questoes,Resposta -> {V,F}
+
+demoComp(Q1 && CQ, R) :- demo(Q1,R1), demoComp(CQ,R2), conjuncao(R1,R2,R).
+demoComp(Q1 ## CQ, R) :- demo(Q1,R1), demoComp(CQ,R2), disjuncao(R1,R2,R).
+demoComp(Q1, R) :- demo(Q1,R).
+
+
+%PREDICADOS DEMOS E RELACIONADOS
+
+utentesAnomalias(S) :- solucoes(utente(ID,N,I,M,D), 
+					   (utente(ID,N,I,M,D), 
+					   (utente_impreciso_idade(ID); utente_impreciso_morada(ID); 
+					   nulo_utente_idade(ID); nulo_utente_morada(M); 
+					   I == xpto6; I == xpto12; M == xpto7)), 
+					   S).
+
+prestadoresAnomalias(S) :- solucoes(prestador(ID,N,E,IDi,D), 
+						   (prestador(ID,N,E,IDi,D),
+						   (prestador_impreciso_idInst(ID); 
+						   nulo_prestador_idInst(IDi);
+						   IDi == xpto8)),
+						   S).
+
+cuidadosAnomaliasUtente(IDu,S) :- solucoes(cuidado(D,H,IDu,IDp,Ds,C), 
+								  (cuidado(D,H,IDu,IDp,Ds,C),
+								  (cuidado_impreciso_descricao(D,H,IDp); cuidado_impreciso_preco(D,H,IDp);
+								  nulo_cuidado_descricao(Ds); nulo_cuidado_custo(C);
+								  Ds == xpto9; Ds == xpto21; C == xpto11)), 
+								  S).
+
+cuidadosAnomaliasPrestador(IDp,S) :- solucoes(cuidado(D,H,IDu,IDp,Ds,C), 
+								  	 (cuidado(D,H,IDu,IDp,Ds,C),
+								  	 (cuidado_impreciso_idUt(D,H,IDp); cuidado_impreciso_descricao(D,H,IDp); cuidado_impreciso_preco(D,H,IDp);
+								  	 nulo_cuidado_descricao(Ds); nulo_cuidado_custo(C);
+								  	 IDu == xpto11; IDu == xpto14; IDu == xpto16; IDu == xpto18; Ds == xpto9; Ds == xpto21; C == xpto11)), 
+								  	 S).
