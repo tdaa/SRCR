@@ -557,6 +557,38 @@ evolucaoIncerta(utente(ID,N,nulo,nulo,D)) :- solucoes(Inv, *(utente(ID,N,xpto12,
 										 	 insere(utente(ID,N,xpto12,xpto13,D)),
 										 	 teste(S).
 
+evolucaoIncerta(prestador(ID,N,E,nulo,D)) :- solucoes(Inv, *(prestador(ID,N,E,xpto8,D)) :: Inv, S),
+										  	 insere(prestador(ID,N,E,xpto8,D)),
+										  	 teste(S).
+
+evolucaoIncerta(cuidado(D,H,nulo,IDp,Ds,C)) :- solucoes(Inv, *(cuidado(D,H,xpto11,IDp,Ds,C)) :: Inv, S),
+										  	   insere(cuidado(D,H,xpto11,IDp,Ds,C)),
+										       teste(S).
+
+evolucaoIncerta(cuidado(D,H,IDu,IDp,nulo,C)) :- solucoes(Inv, *(cuidado(D,H,IDu,IDp,xpto9,C)) :: Inv, S),
+										  	    insere(cuidado(D,H,IDu,IDp,xpto9,C)),
+										        teste(S).
+
+evolucaoIncerta(cuidado(D,H,IDu,IDp,Ds,nulo)) :- solucoes(Inv, *(cuidado(D,H,IDu,IDp,Ds,xpto10)) :: Inv, S),
+										  	     insere(cuidado(D,H,IDu,IDp,Ds,xpto10)),
+										         teste(S).
+
+evolucaoIncerta(cuidado(D,H,nulo,IDp,nulo,C)) :- solucoes(Inv, *(cuidado(D,H,xpto14,IDp,xpto15,C)) :: Inv, S),
+										  	     insere(cuidado(D,H,xpto14,IDp,xpto15,C)),
+										         teste(S).
+
+evolucaoIncerta(cuidado(D,H,nulo,IDp,Ds,nulo)) :- solucoes(Inv, *(cuidado(D,H,xpto16,IDp,Ds,xpto17)) :: Inv, S),
+										  	      insere(cuidado(D,H,xpto16,IDp,Ds,xpto17)),
+										          teste(S).
+
+evolucaoIncerta(cuidado(D,H,nulo,IDp,nulo,nulo)) :- solucoes(Inv, *(cuidado(D,H,xpto18,IDp,xpto19,xpto20)) :: Inv, S),
+										  	     	insere(cuidado(D,H,xpto18,IDp,xpto19,xpto20)),
+										         	teste(S).
+
+evolucaoIncerta(cuidado(D,H,IDu,IDp,nulo,nulo)) :- solucoes(Inv, *(cuidado(D,H,IDu,IDp,xpto21,xpto22)) :: Inv, S),
+										  	       insere(cuidado(D,H,IDu,IDp,xpto21,xpto22)),
+										           teste(S).
+
 %Invariante Referencial: não permitir a remoção de conhecimento que esteja a ser utilizado
 
 -utente(ID,N,I,M,D) :: (solucoes(ID, (cuidado(Dt,H,ID,IDp,Ds,C); -cuidado(Dt,H,ID,IDp,Ds,C)) , S),
