@@ -213,7 +213,11 @@ evolucao(Termo) :- solucoes(Inv, +Termo :: Inv, S),
 							   comprimento(S,L),
 							   L==1).
 
-+utente(ID,N,I,M,D) :: (solucoes(ID, (utente(ID,N,_,_,Ds), utente_perfeito(ID), abaixo1ano(D,Ds)),S),
++prestador(ID,N,E,IDi,D) :: (solucoes(IDp, instituicao(IDi,_,_), S),
+							 comprimento(S,L),
+							 L==1).
+
++utente(ID,N,I,M,D) :: (solucoes(ID, (utente(ID,_,_,_,Ds), utente_perfeito(ID), abaixo1ano(D,Ds)),S),
 						comprimento(S,L),
 						L=<1).
 
@@ -221,7 +225,7 @@ evolucao(Termo) :- solucoes(Inv, +Termo :: Inv, S),
 						comprimento(S,L),
 						L==0).
 
-+utente(ID,N,I,M,D) :: (solucoes(ID, ((utente(ID,N,_,_,Ds); excecao(utente(ID,N,_,_,Ds))), D < Ds), S),
++utente(ID,N,I,M,D) :: (solucoes(ID, ((utente(ID,_,_,_,Ds); excecao(utente(ID,_,_,_,Ds))), D < Ds), S),
 						comprimento(S,L),
 						L==0).
 
@@ -232,7 +236,7 @@ evolucao(Termo) :- solucoes(Inv, +Termo :: Inv, S),
 						comprimento(S,L),
 						L==0).
 
-+prestador(ID,N,E,IDi,D) :: (solucoes(ID, (prestador(ID,N,E,_,Ds), prestador_perfeito(ID), abaixo4anos(D,Ds)),S),
++prestador(ID,N,E,IDi,D) :: (solucoes(ID, (prestador(ID,_,_,_,Ds), prestador_perfeito(ID), abaixo4anos(D,Ds)),S),
 							 comprimento(S,L),
 							 L=<1).
 
@@ -240,7 +244,7 @@ evolucao(Termo) :- solucoes(Inv, +Termo :: Inv, S),
 							 comprimento(S,L),
 							 L==0).
 
-+prestador(ID,N,I,M,D) :: (solucoes(ID, ((prestador(ID,N,E,_,Ds); excecao(prestador(ID,N,E,_,Ds))), D < Ds), S),
++prestador(ID,N,I,M,D) :: (solucoes(ID, ((prestador(ID,_,_,_,Ds); excecao(prestador(ID,_,_,_,Ds))), D < Ds), S),
 						   comprimento(S,L),
 						   L==0).
 
@@ -674,16 +678,16 @@ removeImpreciso(cuidado(D,H,_,IDp,_,_)) :- solucoes(cuidado(D,H,IDu,IDp,Ds,C), (
 										   IDu \= xpto11, IDu \= xpto14, IDu \= xpto16, IDu \= xpto18, Ds \= xpto9, Ds \= xpto21, C \= xpto10), S),
 									   	   removeListaImprecisos(S).
 
-removePerfeitoDatas(utente(ID,_,_,_,_)) :- solucoes(utente(ID,N,I,M,D), (utente_perfeito(ID), utente(ID,N,I,M,D), Ds \= D), S),
-									  	   solucoes(-utente(ID,N,I,M,D), (utente_perfeito(ID), -utente(ID,N,I,M,D)), R),
+removePerfeitoDatas(utente(ID,_,_,_,D)) :- solucoes(utente(ID,N,I,M,Ds), (utente_perfeito(ID), utente(ID,N,I,M,Ds), Ds \= D), S),
+									  	   solucoes(-utente(ID,N,I,M,Ds), (utente_perfeito(ID), -utente(ID,N,I,M,Ds)), R),
 									  	   removeLista(S),
 									  	   removeLista(R),
 									  	   comprimento(S,C1),
 									  	   comprimento(S,C2),
 									  	   (((C1 \= 0; C2 \= 0), retract(utente_perfeito(ID))); (C1==0;C2==0)).
 
-removePerfeitoDatas(prestador(ID,_,_,_,_)) :- solucoes(prestador(ID,N,E,IDi,D), (prestador_perfeito(ID), prestador(ID,N,E,IDi,D), Ds \= D), S),
-										 	  solucoes(-prestador(ID,N,E,IDi,D), (prestador_perfeito(ID), -prestador(ID,N,E,IDi,D)), R),
+removePerfeitoDatas(prestador(ID,_,_,_,D)) :- solucoes(prestador(ID,N,E,IDi,Ds), (prestador_perfeito(ID), prestador(ID,N,E,IDi,Ds), Ds \= D), S),
+										 	  solucoes(-prestador(ID,N,E,IDi,Ds), (prestador_perfeito(ID), -prestador(ID,N,E,IDi,Ds)), R),
 									  	 	  removeLista(S),
 									  	 	  removeLista(R),
 									  	 	  comprimento(S,C1),

@@ -95,16 +95,16 @@ Int->N
 
 ----------------ERRO - nao arranjado
 
-(P->P) não deixa editar mais que 1 vez
-(P->P) permite adição de conhecimento repetido (com o mesmo ID) uma vez
-(N->N) permite adição de conhecimento repetido (com o mesmo ID) uma vez
-(IncN->N) para mais que um xpto nao funciona
+(P->P) não deixa editar mais que 1 vez -- CORRIGIDO
+(P->P) permite adição de conhecimento repetido (com o mesmo ID) uma vez -- CORRIGIDO
+(N->N) permite adição de conhecimento repetido (com o mesmo ID) uma vez -- NAO TENHO A CERTEZA SE É UM ERRO OU SE É SUPOSTO SER ASSIM, nao sei bem o que fazer aqui, provavelmente era suposto deixar ter mais que um, mas o id e o nome deviam-se manter os mesmos, só a idade, morada e data é que podiam ser diferentes, not sure
+(IncN->N) para mais que um xpto nao funciona -- NAO CONSEGUI PERCEBER O ERRO, NAO PERCEBI O QUE QUERES DIZER, NEED MORE INFORMATION
 
-(Im->P, C =< 39, C >= 35) não funciona o teste, queixa-se do =<, nao sei se vamos poder ter este caso assim
+(Im->P, C =< 39, C >= 35) não funciona o teste, queixa-se do =<, nao sei se vamos poder ter este caso assim -- NAO PERCEBI
 evolucaoPositiva(cuidado(2018-12-8, 7:00, 10, 8, dores_de_cabeca, 36)).
 
 
-(Pode nao ser considerado erro) Não se verifica se já existe instituicao a que um determinado prestador está associado
+(Pode nao ser considerado erro) Não se verifica se já existe instituicao a que um determinado prestador está associado -- CORRIGIDO
 
 
 
