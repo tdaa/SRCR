@@ -1,0 +1,179 @@
+----------------------TESTES
+
+---POSITIVO
+
+Pinexistente
+	evolucaoPositiva(utente(15,ola,22,gondas,2010)).
+	evolucaoPositiva(prestador(14,sergio,ola,3,2013)).
+	evolucaoPositiva(cuidado(2055-01-05, 17:45, 6, 8, epilepsia, 60)).
+
+P->P
+	evolucaoPositiva(utente(2,isabel_pereira,20,vila_verde,2017)).
+	evolucaoPositiva(utente(2,isabel_pereira,20,vila_verde,2016)).
+	evolucaoPositiva(utente(2,isabel_pereira,20,vila_verde,2018)).
+	evolucaoPositiva(prestador(4, joao_machado, oftomologia, 3, 2018)).
+	evolucaoPositiva(cuidado(2018-11-27, 13:45, 3, 9, miopia2222, 65)).
+
+N->P
+	evolucaoPositiva(utente(14,maria_felgueiras,25,gondomar,2010)).
+	evolucaoPositiva(prestador(11, goncalo_matos, ginecologia, 1, 2010)).
+	evolucaoPositiva(cuidado(2019-01-05, 17:45, 6, 8, epilepsia, 60)).
+
+Inc->P
+	evolucaoPositiva(utente(7, mario_duarte, 12, gualtar, 1987)).
+	evolucaoPositiva(prestador(6, renato_torres, pediatria, 2, 2018)).
+	evolucaoPositiva(cuidado(2018-4-10, 16:00, 2, 1, ansiedade, 4)).
+
+IncN->P
+	evolucaoPositiva(utente(6, antonio_silva, 13, ola, 2009)).
+	evolucaoPositiva(prestador(5, andre_correia, psiquiatria, 3, 2016)).
+evolucaoPositiva(cuidado(2018-4-10, 16:00, 1, 1, ansiedade, 4)).
+	evolucaoPositiva(cuidado(2018-4-10, 16:00, 2, 1, ansiedade, 4)).
+
+Im->P
+	evolucaoPositiva(utente(13, ricardo_pires, 32, barros, 2013)).
+	evolucaoPositiva(utente(11,rita_dias,15,ferreiros,2010)).
+	evolucaoPositiva(prestador(13, nuno_oliveira, oftamologia, 2, 2013)).
+	evolucaoPositiva(cuidado(2018-12-8, 7:00, 10, 8, dores_de_cabeca, 17)).
+	evolucaoPositiva(cuidado(2018-12-28, 15:00, 9, 7, ataque_cardiaco, 38)).
+
+Int->P
+	evolucaoPositiva(utente(1, tiago_alves, 12, vila_verde, 2018)).
+	evolucaoPositiva(prestador(3, filipa_ferreira, pediatria, 1, 2017)).
+	evolucaoPositiva(cuidado(2018-4-11, 17:00, 5, 7, 1, 45)).
+
+---NEGATIVO
+
+Ninexistente
+	evolucaoNegativa(utente(15, maria_felgueiras, 25, gondomar, 2010)).
+	evolucaoNegativa(prestador(222, julio_goncalves, urologia, 1, 2018)).
+	evolucaoNegativa(cuidado(2025-01-05, 17:45, 6, 8, epilepsia, 60)).
+
+N->N
+	evolucaoNegativa(utente(14, maria_felgueiras, 28, gondomar, 2010)).
+	evolucaoNegativa(prestador(10, julio_goncalves, urologia222, 15, 2018)).
+evolucaoNegativa(cuidado(2019-01-05, 17:45, 6, 8, epilepsia, 60)).
+	evolucaoNegativa(cuidado(2019-01-05, 17:45, 6, 8, epil, 60)).
+
+P->N
+	evolucaoNegativa(utente(2, isabel_pereira, 21, vila_verde, 2017)).
+	evolucaoNegativa(prestador(2, mario_oliveira, clinica_geral, 3, 2010)).
+	evolucaoNegativa(cuidado(2018-10-20, 10:45, 1, 4, acne55, 60)).
+
+Inc->N
+	evolucaoNegativa(utente(3, francisco_matos, 16, ola, 2010)).
+	evolucaoNegativa(prestador(8, andre_fernandes, neurologia, 2, 2016)).
+	evolucaoNegativa(cuidado(2018-12-4, 12:00, 8, 8, ola, 13)).
+
+evolucaoNegativa(cuidado(2018-6-2, 15:30, 3, 3, olaaaa, 10)).
+
+IncN->N
+	evolucaoNegativa(utente(5, rita_pereira, 45, ola, 2016)).
+evolucaoNegativa(prestador(5, andre_correia, psiquiatria, 4, 2016)).
+	evolucaoNegativa(prestador(5, andre_correia, psiquiatria, 2, 2016)).
+evolucaoNegativa(cuidado(2018-4-10, 16:00, 1, 1, ansiedade, 4)).
+	evolucaoNegativa(cuidado(2018-4-10, 16:00, 2, 1, ansiedade, 4)).
+
+Im->N
+	evolucaoNegativa(utente(13, ricardo_pires, 15, ola, 2013)).
+	evolucaoNegativa(prestador(13, nuno_oliveira, oftamologia, 1, 2013)).
+	evolucaoNegativa(cuidado(2018-12-28, 15:00, 9, 7, ataque_cardiaco, 38)).
+
+Int->N
+	evolucaoNegativa(utente(1, tiago_alves, 12, vila_verde, 2018)).
+	evolucaoNegativa(prestador(3, filipa_ferreira, pediatria, 1, 2017)).
+	evolucaoNegativa(cuidado(2018-4-11, 17:00, 5, 7, olaaaa, 45)).
+
+
+
+
+
+
+
+
+
+
+----------------ERRO - nao arranjado
+
+(P->P) não deixa editar mais que 1 vez
+(P->P) permite adição de conhecimento repetido (com o mesmo ID) uma vez
+(N->N) permite adição de conhecimento repetido (com o mesmo ID) uma vez
+(IncN->N) para mais que um xpto nao funciona
+
+(Im->P, C =< 39, C >= 35) não funciona o teste, queixa-se do =<, nao sei se vamos poder ter este caso assim
+evolucaoPositiva(cuidado(2018-12-8, 7:00, 10, 8, dores_de_cabeca, 36)).
+
+
+(Pode nao ser considerado erro) Não se verifica se já existe instituicao a que um determinado prestador está associado
+
+
+
+
+
+
+
+
+
+
+----------------MUDADO
+
+excecao(utente(Id,N,I,M,A)) :- utente(Id,N,xpto1,M,A).
+
+
+removePerfeitoDatas(utente(ID,_,_,_,_)) :- solucoes(utente(ID,N,I,M,D), (utente_perfeito(ID), utente(ID,N,I,M,D), Ds \= D), S),
+									  	   solucoes(-utente(ID,N,I,M,D), (utente_perfeito(ID), -utente(ID,N,I,M,D)), R),
+									  	   removeLista(S),
+									  	   removeLista(R),
+									  	   comprimento(S,C1),
+									  	   comprimento(S,C2),
+									  	   (((C1 \= 0; C2 \= 0), retract(utente_perfeito(ID))); (C1==0;C2==0)).
+
+removePerfeitoDatas(prestador(ID,_,_,_,_)) :- solucoes(prestador(ID,N,E,IDi,D), (prestador_perfeito(ID), prestador(ID,N,E,IDi,D), Ds \= D), S),
+										 	  solucoes(-prestador(ID,N,E,IDi,D), (prestador_perfeito(ID), -prestador(ID,N,E,IDi,D)), R),
+									  	 	  removeLista(S),
+									  	 	  removeLista(R),
+									  	 	  comprimento(S,C1),
+									  	 	  comprimento(S,C2),
+									  	 	  (((C1 \= 0; C2 \= 0), retract(prestador_perfeito(ID))); (C1==0;C2==0)).
+
+removePerfeito(utente(ID,_,_,_,_)) :- solucoes(utente(ID,N,I,M,Ds), (utente_perfeito(ID), utente(ID,N,I,M,Ds)), S),
+									  solucoes(-utente(ID,N,I,M,Ds), (utente_perfeito(ID), -utente(ID,N,I,M,Ds)), R),
+									  removeLista(S),
+									  removeLista(R),
+									  comprimento(S,C1),
+									  comprimento(S,C2),
+									  (((C1 \= 0; C2 \= 0), retract(utente_perfeito(ID))); (C1==0;C2==0)).
+
+removePerfeito(prestador(ID,_,_,_,_)) :- solucoes(prestador(ID,N,E,IDi,D), (prestador_perfeito(ID), prestador(ID,N,E,IDi,D)), S),
+										 solucoes(-prestador(ID,N,E,IDi,D), (prestador_perfeito(ID), -prestador(ID,N,E,IDi,D)), R),
+									  	 removeLista(S),
+									  	 removeLista(R),
+									  	 comprimento(S,C1),
+									  	 comprimento(S,C2),
+									  	 (((C1 \= 0; C2 \= 0), retract(prestador_perfeito(ID))); (C1==0;C2==0)).
+
+removePerfeito(cuidado(D,H,_,IDp,_,_)) :- solucoes(cuidado(D,H,IDu,IDp,Ds,C), (cuidado_perfeito(D,H,IDp), cuidado(D,H,IDu,IDp,Ds,C)), S),
+										  solucoes(-cuidado(D,H,IDu,IDp,Ds,C), (cuidado_perfeito(D,H,IDp), -cuidado(D,H,IDu,IDp,Ds,C)), R),
+									  	  removeLista(S),
+									  	  removeLista(R),
+									  	  comprimento(S,C1),
+									  	  comprimento(S,C2),
+									  	  (((C1 \= 0; C2 \= 0), retract(cuidado_perfeito(D,H,IDp))); (C1==0;C2==0)).
+
+
+removeListaImprecisos([]).
+removeListaImprecisos([utente(ID,_,_,_,_)]) :- retract(excecao(utente(ID,_,_,_,_))), (nao(utente_impreciso_idade(ID)); retract(utente_impreciso_idade(ID))), (nao(utente_impreciso_morada(ID)); retract(utente_impreciso_morada(ID))).
+removeListaImprecisos([utente(ID,_,_,_,_)|T]) :- retract(excecao(utente(ID,_,_,_,_))), removeListaImprecisos(T).
+removeListaImprecisos([prestador(ID,_,_,_,_)]) :- retract(excecao(prestador(ID,_,_,_,_))), retract(prestador_impreciso_idInst(ID)).
+removeListaImprecisos([prestador(ID,_,_,_,_)|T]) :- retract(excecao(prestador(ID,_,_,_,_))), removeListaImprecisos(T).
+removeListaImprecisos([cuidado(D,H,_,IDp,_,_)]) :- retract(excecao(cuidado(D,H,_,IDp,_,_))), 
+												   (nao(cuidado_impreciso_idUt(D,H,IDp)); retract(cuidado_impreciso_idUt(D,H,IDp))), 
+												   (nao(cuidado_impreciso_descricao(D,H,IDp)); retract(cuidado_impreciso_descricao(D,H,IDp))), 
+												   (nao(cuidado_impreciso_preco(D,H,IDp)); retract(cuidado_impreciso_preco(D,H,IDp))).
+removeListaImprecisos([cuidado(D,H,_,IDp,_,_)|T]) :- retract(excecao(cuidado(D,H,_,IDp,_,_))), removeListaImprecisos(T).
+
+
+testaPerfeito([],utente(ID,_,_,_,_)) :- (utente_perfeito(ID); assert(utente_perfeito(ID))).
+testaPerfeito([],prestador(ID,_,_,_,_)) :- (prestador_perfeito(ID); assert(prestador_perfeito(ID))).
+testaPerfeito([],cuidado(D,H,_,IDp,_,_)) :- (cuidado_perfeito(D,H,IDp); assert(cuidado_perfeito(D,H,IDp))).
+testaPerfeito(R,_).

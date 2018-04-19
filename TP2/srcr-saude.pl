@@ -138,7 +138,7 @@ cuidado_perfeito(2019-01-05, 17:45, 8).
 
 %Nulos interditos sobre a idade e a morada dos utentes e os respetivos Invariantes
 nulo_utente_idade(xpto1).
-excecao(utente(Id,N,I,M,A)) :- utente(Id,N,I,M,xpto1,A).
+excecao(utente(Id,N,I,M,A)) :- utente(Id,N,xpto1,M,A).
 
 +utente(Id,N,I,M,A) :: (solucoes(Is,(utente(Id,_,Is,_,_), nulo_utente_idade(Is)),S),
 						comprimento(S,L),
@@ -191,17 +191,17 @@ excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,xpto16,IDp,Ds,xpto17).
 excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,xpto18,IDp,xpto19,xpto20).
 excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,IDu,IDp,xpto21,xpto22).
 
-%Invariante Estrutural: não permitir a inserção de conhecimento repetido
-
-+instituicao(ID,D,C)  :: (solucoes(ID, instituicao(ID,X,Y), S),
-					      comprimento(S,L),
-					      L =< 1).
-
 %Extensão do predicado evolucao que só é utilizado para a instituicao
 
 evolucao(Termo) :- solucoes(Inv, +Termo :: Inv, S),
 				   insere(Termo), 
 				   teste(S).
+
+%Invariante Estrutural: não permitir a inserção de conhecimento repetido
+
++instituicao(ID,D,C)  :: (solucoes(ID, instituicao(ID,X,Y), S),
+					      comprimento(S,L),
+					      L =< 1).
 
 %Invariante Referencial: verificar se utente e prestador existem na base de conhecimento, caso contrário não é permitida a adição do cuidado
 
@@ -244,8 +244,7 @@ evolucao(Termo) :- solucoes(Inv, +Termo :: Inv, S),
 						   comprimento(S,L),
 						   L==0).
 
-+prestador(ID,N,E,IDi,D) :: (solucoes(ID, (prestador(ID,N,E,IDs,D), 
-							 IDs == xpto8, -prestador(ID,N,E,IDn,D), IDi == IDn), S),
++prestador(ID,N,E,IDi,D) :: (solucoes(ID, (prestador(ID,N,E,IDs,D), IDs == xpto8, -prestador(ID,N,E,IDn,D), IDi == IDn), S),
 							 comprimento(S,L),
 							 L==0).
 
@@ -652,7 +651,6 @@ abaixo4anos(D1,D2) :- (D1-D2) < 4.
 removeLista([]).
 removeLista([H|T]) :- retract(H), removeLista(T).
 
-
 removeIncerto(utente(ID,_,_,_,_)) :- solucoes(utente(ID,N,I,M,D), (utente(ID,N,I,M,D), (I == xpto6; I == xpto12; M == xpto7)), S),
 									 solucoes(-utente(ID,N,I,M,Ds), -utente(ID,N,I,M,Ds), R),
 									 removeLista(S),
@@ -682,7 +680,7 @@ removePerfeitoDatas(utente(ID,_,_,_,_)) :- solucoes(utente(ID,N,I,M,D), (utente_
 									  	   removeLista(R),
 									  	   comprimento(S,C1),
 									  	   comprimento(S,C2),
-									  	   ((C1 \= 0; C2 \= 0), retract(utente_perfeito(ID))).
+									  	   (((C1 \= 0; C2 \= 0), retract(utente_perfeito(ID))); (C1==0;C2==0)).
 
 removePerfeitoDatas(prestador(ID,_,_,_,_)) :- solucoes(prestador(ID,N,E,IDi,D), (prestador_perfeito(ID), prestador(ID,N,E,IDi,D), Ds \= D), S),
 										 	  solucoes(-prestador(ID,N,E,IDi,D), (prestador_perfeito(ID), -prestador(ID,N,E,IDi,D)), R),
@@ -690,7 +688,7 @@ removePerfeitoDatas(prestador(ID,_,_,_,_)) :- solucoes(prestador(ID,N,E,IDi,D), 
 									  	 	  removeLista(R),
 									  	 	  comprimento(S,C1),
 									  	 	  comprimento(S,C2),
-									  	 	  ((C1 \= 0; C2 \= 0), retract(prestador_perfeito(ID))).
+									  	 	  (((C1 \= 0; C2 \= 0), retract(prestador_perfeito(ID))); (C1==0;C2==0)).
 
 removePerfeito(utente(ID,_,_,_,_)) :- solucoes(utente(ID,N,I,M,Ds), (utente_perfeito(ID), utente(ID,N,I,M,Ds)), S),
 									  solucoes(-utente(ID,N,I,M,Ds), (utente_perfeito(ID), -utente(ID,N,I,M,Ds)), R),
@@ -698,7 +696,7 @@ removePerfeito(utente(ID,_,_,_,_)) :- solucoes(utente(ID,N,I,M,Ds), (utente_perf
 									  removeLista(R),
 									  comprimento(S,C1),
 									  comprimento(S,C2),
-									  ((C1 \= 0; C2 \= 0), retract(utente_perfeito(ID))).
+									  (((C1 \= 0; C2 \= 0), retract(utente_perfeito(ID))); (C1==0;C2==0)).
 
 removePerfeito(prestador(ID,_,_,_,_)) :- solucoes(prestador(ID,N,E,IDi,D), (prestador_perfeito(ID), prestador(ID,N,E,IDi,D)), S),
 										 solucoes(-prestador(ID,N,E,IDi,D), (prestador_perfeito(ID), -prestador(ID,N,E,IDi,D)), R),
@@ -706,7 +704,7 @@ removePerfeito(prestador(ID,_,_,_,_)) :- solucoes(prestador(ID,N,E,IDi,D), (pres
 									  	 removeLista(R),
 									  	 comprimento(S,C1),
 									  	 comprimento(S,C2),
-									  	 ((C1 \= 0; C2 \= 0), retract(prestador_perfeito(ID))).
+									  	 (((C1 \= 0; C2 \= 0), retract(prestador_perfeito(ID))); (C1==0;C2==0)).
 
 removePerfeito(cuidado(D,H,_,IDp,_,_)) :- solucoes(cuidado(D,H,IDu,IDp,Ds,C), (cuidado_perfeito(D,H,IDp), cuidado(D,H,IDu,IDp,Ds,C)), S),
 										  solucoes(-cuidado(D,H,IDu,IDp,Ds,C), (cuidado_perfeito(D,H,IDp), -cuidado(D,H,IDu,IDp,Ds,C)), R),
@@ -714,23 +712,24 @@ removePerfeito(cuidado(D,H,_,IDp,_,_)) :- solucoes(cuidado(D,H,IDu,IDp,Ds,C), (c
 									  	  removeLista(R),
 									  	  comprimento(S,C1),
 									  	  comprimento(S,C2),
-									  	  ((C1 \= 0; C2 \= 0), retract(cuidado_perfeito(D,H,IDp))).
+									  	  (((C1 \= 0; C2 \= 0), retract(cuidado_perfeito(D,H,IDp))); (C1==0;C2==0)).
 
 removeListaImprecisos([]).
-removeListaImprecisos([utente(ID,_,_,_,_)]) :- retract(excecao(utente(ID,_,_,_,_))), (retract(utente_impreciso_idade(ID)); retract(utente_impreciso_morada(ID))).
+removeListaImprecisos([utente(ID,_,_,_,_)]) :- retract(excecao(utente(ID,_,_,_,_))), (nao(utente_impreciso_idade(ID)); retract(utente_impreciso_idade(ID))), (nao(utente_impreciso_morada(ID)); retract(utente_impreciso_morada(ID))).
 removeListaImprecisos([utente(ID,_,_,_,_)|T]) :- retract(excecao(utente(ID,_,_,_,_))), removeListaImprecisos(T).
 removeListaImprecisos([prestador(ID,_,_,_,_)]) :- retract(excecao(prestador(ID,_,_,_,_))), retract(prestador_impreciso_idInst(ID)).
 removeListaImprecisos([prestador(ID,_,_,_,_)|T]) :- retract(excecao(prestador(ID,_,_,_,_))), removeListaImprecisos(T).
 removeListaImprecisos([cuidado(D,H,_,IDp,_,_)]) :- retract(excecao(cuidado(D,H,_,IDp,_,_))), 
-												   (retract(cuidado_impreciso_idUt(D,H,IDp)); 
-												   retract(cuidado_impreciso_descricao(D,H,IDp)); 
-												   retract(cuidado_impreciso_preco(D,H,IDp))).
+												   (nao(cuidado_impreciso_idUt(D,H,IDp)); retract(cuidado_impreciso_idUt(D,H,IDp))), 
+												   (nao(cuidado_impreciso_descricao(D,H,IDp)); retract(cuidado_impreciso_descricao(D,H,IDp))), 
+												   (nao(cuidado_impreciso_preco(D,H,IDp)); retract(cuidado_impreciso_preco(D,H,IDp))).
 removeListaImprecisos([cuidado(D,H,_,IDp,_,_)|T]) :- retract(excecao(cuidado(D,H,_,IDp,_,_))), removeListaImprecisos(T).
 
-testaPerfeito(R,_) :- R \= 0.
-testaPerfeito(0,utente(ID,_,_,_,_)) :- assert(utente_perfeito(ID)).
-testaPerfeito(0,prestador(ID,_,_,_,_)) :- assert(prestador_perfeito(ID)).
-testaPerfeito(0,cuidado(D,H,_,IDp,_,_)) :- assert(cuidado_perfeito(D,H,IDp)).
+
+testaPerfeito([],utente(ID,_,_,_,_)) :- (utente_perfeito(ID); assert(utente_perfeito(ID))).
+testaPerfeito([],prestador(ID,_,_,_,_)) :- (prestador_perfeito(ID); assert(prestador_perfeito(ID))).
+testaPerfeito([],cuidado(D,H,_,IDp,_,_)) :- (cuidado_perfeito(D,H,IDp); assert(cuidado_perfeito(D,H,IDp))).
+testaPerfeito(R,_).
 
 removeIncertoEspecifico(utente(ID,_,_,_,_),i) :- solucoes(utente(ID,N,I,M,D), (utente(ID,N,I,M,D), (I == xpto6; I == xpto12)), S),
 									 			 removeLista(S).
