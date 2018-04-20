@@ -484,7 +484,7 @@ evolucaoImprecisa(cuidado(D,H,IDu,IDp,Ds,C),T) :- solucoes(Inv, ~(cuidado(D,H,ID
 							     comprimento(S,L),
 							     L==0).
 
-^(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, (cuidado(D,H,_,IDp,_,Cs), nulo_cuidado_custo(Cs)), C\=xpto5, S),
+^(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, (cuidado(D,H,_,IDp,_,Cs), nulo_cuidado_custo(Cs), C\=xpto5), S),
 							     comprimento(S,L),
 							     L==0).
 
