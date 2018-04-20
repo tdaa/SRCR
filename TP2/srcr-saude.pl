@@ -472,7 +472,7 @@ evolucaoImprecisa(cuidado(D,H,IDu,IDp,Ds,C),T) :- solucoes(Inv, ~(cuidado(D,H,ID
 						  comprimento(S,L),
 						  L=<1).
 
-^(prestador(ID,N,E,IDi,D)) :: (solucoes(IDs,(prestador(ID,_,_,IDs,_), nulo_prestador_idInst(IDs)),S),
+^(prestador(ID,N,E,IDi,D)) :: (solucoes(IDs,(prestador(ID,_,_,IDs,_), nulo_prestador_idInst(IDs), IDi\=xpto3),S),
 						   	   comprimento(S,L),
 						   	   L==0).
 
