@@ -142,12 +142,16 @@ cuidado_perfeito(2019-1-5, 17:45, 8).
 nulo_utente_idade(xpto1).
 excecao(utente(Id,N,I,M,A)) :- utente(Id,N,xpto1,M,A).
 
+%Invariante que não permite a adição de conhecimento no caso de exister o respetivo termo com nulo interdito
+
 +utente(Id,N,I,M,A) :: (solucoes(Is,(utente(Id,_,Is,_,_), nulo_utente_idade(Is)),S),
 						comprimento(S,L),
 						L==0).
 
 nulo_utente_morada(xpto2).
 excecao(utente(Id,N,I,M,A)) :- utente(Id,N,I,xpto2,A).
+
+%Invariante que não permite a adição de conhecimento no caso de exister o respetivo termo com nulo interdito
 
 +utente(Id,N,I,M,A) :: (solucoes(Ms,(utente(Id,_,_,Ms,_), nulo_utente_morada(Ms)),S),
 						comprimento(S,L),
@@ -157,6 +161,8 @@ excecao(utente(Id,N,I,M,A)) :- utente(Id,N,I,xpto2,A).
 nulo_prestador_idInst(xpto3).
 excecao(prestador(Id,N,E,Idi,A)) :- prestador(Id,N,E,xpto3,A).
 
+%Invariante que não permite a adição de conhecimento no caso de exister o respetivo termo com nulo interdito
+
 +prestador(Id,N,E,Idi,A) :: (solucoes(Ids,(prestador(Id,_,_,Ids,_), nulo_prestador_idInst(Ids)),S),
 							 comprimento(S,L),
 							 L==0).
@@ -165,12 +171,16 @@ excecao(prestador(Id,N,E,Idi,A)) :- prestador(Id,N,E,xpto3,A).
 nulo_cuidado_descricao(xpto4).
 excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,IDu,IDp,xpto4,C).
 
+%Invariante que não permite a adição de conhecimento no caso de exister o respetivo termo com nulo interdito
+
 +cuidado(D,H,IDu,IDp,Ds,C) :: (solucoes(Dss,(cuidado(D,H,IDu,IDp,Dss,C), nulo_cuidado_descricao(Dss)),S),
 							   comprimento(S,L),
 							   L==0).
 
 nulo_cuidado_custo(xpto5).
 excecao(cuidado(D,H,IDu,IDp,Ds,C)) :- cuidado(D,H,IDu,IDp,Ds,xpto5).
+
+%Invariante que não permite a adição de conhecimento no caso de exister o respetivo termo com nulo interdito
 
 +cuidado(D,H,IDu,IDp,Ds,C) :: (solucoes(Cs,(cuidado(D,H,IDu,IDp,Ds,Cs), nulo_cuidado_custo(Cs)),S),
 							   comprimento(S,L),
@@ -215,21 +225,36 @@ evolucao(Termo) :- solucoes(Inv, +Termo :: Inv, S),
 							   comprimento(S,L),
 							   L==1).
 
+%Invariante Referencial: verificar se a instituição existe na base de conhecimento, caso contrário não é permitida a adição do prestador
+
 +prestador(ID,N,E,IDi,D) :: (solucoes(IDp, instituicao(IDi,_,_), S),
 							 comprimento(S,L),
 							 L==1).
+
+%Invariante Referencial: verificar se já existe conhecimento positivo sobre o utente na base de conhecimento e, 
+%em caso afirmativo, se esta já foi inserida à mais de 1 ano, caso contrário não é permitida a adição do utente
 
 +utente(ID,N,I,M,D) :: (solucoes(ID, (utente(ID,_,_,_,Ds), utente_perfeito(ID), abaixo1ano(D,Ds)),S),
 						comprimento(S,L),
 						L=<1).
 
+%Invariante Referencial: verificar se não existe conhecimento perfeito negativo sobre o utente na base de conhecimento, 
+%caso contrário não é permitida a adição do utente
+
 +utente(ID,N,I,M,D) :: (solucoes(ID, (utente_perfeito(ID), -utente(ID,_,_,_,_)), S),
 						comprimento(S,L),
 						L==0).
 
+%Invariante Referencial: verificar se existe conhecimento imperfeito sobre o utente na base de conhecimento e, em caso afirmativo,
+%se a data de inserção do mesmo é inferior ao do utente a inserir, caso contrário não é permitida a adição do utente
+
 +utente(ID,N,I,M,D) :: (solucoes(ID, ((utente(ID,_,_,_,Ds); excecao(utente(ID,_,_,_,Ds))), D < Ds), S),
 						comprimento(S,L),
 						L==0).
+
+%Invariante Referencial: verificar se existe conhecimento negativo associado a conhecimento incerto sobre o utente na base de conhecimento e, 
+%em caso afirmativo, verifica se o utente a adicionar não entra em contradição com o conhecimento negativo presente à priori,
+%caso contrário não é permitida a adição do utente
 
 +utente(ID,N,I,M,D) :: (solucoes(ID, (utente(ID,N,Is,Ms,D), 
 						((Is == xpto6, -utente(ID,N,In,Ms,D), I == In); 
@@ -238,29 +263,52 @@ evolucao(Termo) :- solucoes(Inv, +Termo :: Inv, S),
 						comprimento(S,L),
 						L==0).
 
+%Invariante Referencial: verificar se já existe conhecimento positivo sobre o prestador na base de conhecimento e,
+%em caso afirmativo, se esta já foi inserida à mais de 4 anos, caso contrário não é permitida a adição do prestador
+
 +prestador(ID,N,E,IDi,D) :: (solucoes(ID, (prestador(ID,_,_,_,Ds), prestador_perfeito(ID), abaixo4anos(D,Ds)),S),
 							 comprimento(S,L),
 							 L=<1).
+
+%Invariante Referencial: verificar se não existe conhecimento perfeito negativo sobre o prestador na base de conhecimento, 
+%caso contrário não  é permitida a adição do prestador
 
 +prestador(ID,N,E,IDi,D) :: (solucoes(ID, (prestador_perfeito(ID), -prestador(ID,_,_,_,_)), S),
 							 comprimento(S,L),
 							 L==0).
 
+%Invariante Referencial: verificar se existe conhecimento imperfeito sobre o prestador na base de conhecimento e, em caso afirmativo,
+%se a data de inserção do mesmo é inferior ao do prestador a inserir, caso contrário não é permitida a adição do prestador
+
 +prestador(ID,N,I,M,D) :: (solucoes(ID, ((prestador(ID,_,_,_,Ds); excecao(prestador(ID,_,_,_,Ds))), D < Ds), S),
 						   comprimento(S,L),
 						   L==0).
+
+%Invariante Referencial: verificar se existe conhecimento negativo associado a conhecimento incerto sobre o prestador na base de conhecimento e, 
+%em caso afirmativo, verifica se o prestador a adicionar não entra em contradição com o conhecimento negativo presente à priori,
+%caso contrário não é permitida a adição do prestador
 
 +prestador(ID,N,E,IDi,D) :: (solucoes(ID, (prestador(ID,N,E,IDs,D), IDs == xpto8, -prestador(ID,N,E,IDn,D), IDi == IDn), S),
 							 comprimento(S,L),
 							 L==0).
 
+%Invariante Referencial: verificar se não existe conhecimento positivo sobre o cuidado na base de conhecimento, 
+%caso contrário não é permitida a adição do cuidado
+
 +cuidado(D,H,IDu,IDp,Ds,C) :: (solucoes((D,H,IDp), (cuidado(D,H,_,IDp,_,_), cuidado_perfeito(D,H,IDp)),S),
 							   comprimento(S,L),
 							   L=<1).
 
+%Invariante Referencial: verificar se não existe conhecimento perfeito negativo sobre o cuidado na base de conhecimento, 
+%caso contrário não é permitida a adição do cuidado
+
 +cuidado(D,H,IDu,IDp,Ds,C) :: (solucoes(ID, (cuidado_perfeito(D,H,IDp), -cuidado(D,H,_,IDp,_,_)), S),
 							  comprimento(S,L),
 							  L==0).
+
+%Invariante Referencial: verificar se existe conhecimento negativo associado a conhecimento incerto sobre o cuidado na base de conhecimento e, 
+%em caso afirmativo, verifica se o cuidado a adicionar não entra em contradição com o conhecimento negativo presente à priori,
+%caso contrário não é permitida a adição do cuidado
 
 +cuidado(D,H,IDu,IDp,Ds,C) :: (solucoes(ID, (cuidado(D,H,IDus,IDp,Dss,Cs), 
 							  ((IDus == xpto11, -cuidado(D,H,IDun,IDp,Dss,Cs), IDu == IDun);
@@ -272,6 +320,8 @@ evolucao(Termo) :- solucoes(Inv, +Termo :: Inv, S),
 							  (Cs == xpto10, -cuidado(D,H,IDus,IDp,Dss,Cn), C == Cn))), S),
 							  comprimento(S,L),
 							  L==0).
+
+%Extensão do predicado evolucaoPositiva que permite a adição de conhecimento positivo
 
 evolucaoPositiva(utente(ID,N,I,M,D)) :- solucoes(Inv, +utente(ID,N,I,M,D) :: Inv, S),
 										insere(utente(ID,N,I,M,D)),
@@ -296,17 +346,27 @@ evolucaoPositiva(cuidado(D,H,IDu,IDp,Ds,C)) :- solucoes(Inv, +cuidado(D,H,IDu,ID
 										  	   removeIncerto(cuidado(D,H,_,IDp,_,_)),
 											   assert(cuidado_perfeito(D,H,IDp)).
 
+%Invariante Referencial: verificar se não existe conhecimento positivo associado a determinado utente, 
+%caso contrário não é permitida a adição do conhecimento negativo do utente
+
 +(-utente(ID,N,I,M,D)) :: (solucoes(ID, (utente(ID,_,Is,Ms,_), Is \= xpto6, Is \= xpto12, Ms \= xpto7), S),
 						   comprimento(S,L),
 						   L==0).
+
+%Invariante Referencial: verificar se não existe conhecimento impreciso associado a determinado utente, 
+%caso contrário não é permitida a adição do conhecimento negativo do utente
 
 +(-utente(ID,N,I,M,D)) :: (solucoes(ID, (utente_impreciso_idade(ID); utente_impreciso_morada(ID)), S),
 						   comprimento(S,L),
 						   L==0).
 
+%Invariante <Estrutural: verificar se não existe conhecimento negativo repetido na base de conhecimento
+
 +(-utente(ID,N,I,M,D)) :: (solucoes(ID, (-utente(ID,N,I,M,D)), S),
 						   comprimento(S,L),
 						   L=<2).
+
+%Invariantes Referenciais: verificar se não existe conhecimento interdito sobre a idade ou morada do utente, caso contrário não é permitida a adição do utente
 
 +(-utente(ID,N,I,M,D)) :: (solucoes(Is,(utente(ID,_,Is,_,_), nulo_utente_idade(Is)),S),
 						   comprimento(S,L),
@@ -316,33 +376,53 @@ evolucaoPositiva(cuidado(D,H,IDu,IDp,Ds,C)) :- solucoes(Inv, +cuidado(D,H,IDu,ID
 						   comprimento(S,L),
 						   L==0).
 
+%Invariante Referencial: verificar se não existe conhecimento positivo associado a determinado prestador, 
+%caso contrário não é permitida a adição do conhecimento negativo do prestador
+
 +(-prestador(ID,N,E,IDi,D)) :: (solucoes(ID, (prestador(ID,_,_,IDs,_), IDs \= xpto8), S),
 						   		comprimento(S,L),
 						   		L==0).
+
+%Invariante Referencial: verificar se não existe conhecimento impreciso associado a determinado prestador, 
+%caso contrário não é permitida a adição do conhecimento negativo do prestador
 
 +(-prestador(ID,N,E,IDi,D)) :: (solucoes(ID, prestador_impreciso_idInst(ID), S),
 						   		comprimento(S,L),
 						  		L==0).
 
+%Invariante Estrutural: verificar se não existe conhecimento negativo repetido na base de conhecimento
+
 +(-prestador(ID,N,E,IDi,D)) :: (solucoes(ID, -prestador(ID,N,E,IDi,D), S),
 						   		comprimento(S,L),
 						   		L=<2).
+
+%Invariante Referencial: verificar se não existe conhecimento interdito sobre o ID da instituição do prestador, caso contrário não é permitida a adição do prestador
 
 +(-prestador(ID,N,E,IDi,D)) :: (solucoes(IDs,(prestador(ID,_,_,IDs,_), nulo_prestador_idInst(IDs)),S),
 						   		comprimento(S,L),
 						   		L==0).
 
+%Invariante Referencial: verificar se não existe conhecimento positivo associado a determinado cuidado, 
+%caso contrário não é permitida a adição do conhecimento negativo do cuidado
+
 +(-cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes((D,H,IDp), (cuidado(D,H,IDus,IDp,Dss,Cs), IDus \= xpto11, IDus \= xpto14, IDus \= xpto16, IDus \= xpto18, Dss \= xpto9, Dss \= xpto21, Cs \= xpto10), S),
 						   		  comprimento(S,L),
 						   		  L==0).
+
+%Invariante Referencial: verificar se não existe conhecimento impreciso associado a determinado cuidado, 
+%caso contrário não é permitida a adição do conhecimento negativo do cuidado
 
 +(-cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes((D,H,IDp), (cuidado_impreciso_descricao(D,H,IDp); cuidado_impreciso_preco(D,H,IDp); cuidado_impreciso_idUt(D,H,IDp)), S),
 						   		  comprimento(S,L),
 						  		  L==0).
 
+%Invariante Estrutural: verificar se não existe conhecimento negativo repetido na base de conhecimento
+
 +(-cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes((D,H,IDp), -cuidado(D,H,IDu,IDp,Ds,C), S),
 						   		  comprimento(S,L),
 						   		  L=<2).
+
+%Invariantes Referenciais: verificar se não existe conhecimento interdito sobre a descrição ou custo do cuidado, caso contrário não é permitida a adição do cuidado
 
 +(-cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes((D,H,IDp),(cuidado(D,H,IDus,IDp,Ds,Cs), nulo_cuidado_custo(Cs)),S),
 						   		  comprimento(S,L),
@@ -351,6 +431,8 @@ evolucaoPositiva(cuidado(D,H,IDu,IDp,Ds,C)) :- solucoes(Inv, +cuidado(D,H,IDu,ID
 +(-cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes((D,H,IDp),(cuidado(D,H,IDus,IDp,Ds,Cs), nulo_cuidado_descricao(Ds)),S),
 						   		  comprimento(S,L),
 						   		  L==0).
+
+%Extensão do predicado evolucaoNegativa que permite a adição de conhecimento negativo
 
 evolucaoNegativa(utente(ID,N,I,M,D)) :- solucoes(Inv, +(-utente(ID,N,I,M,D)) :: Inv, S),
 									    insere(-utente(ID,N,I,M,D)),
@@ -370,13 +452,19 @@ evolucaoNegativa(cuidado(D,H,IDu,IDp,Ds,C)) :- solucoes(Inv, +(-cuidado(D,H,IDu,
 										 	   solucoes(ID, (cuidado(D,H,IDu,IDp,Ds,C), IDu == xpto11; IDu == xpto14; IDu == xpto14; IDu == xpto16; IDu == xpto18; Ds == xpto9; Ds == xpto21; C == xpto10), R),
 										 	   testaPerfeito(R,cuidado(D,H,_,IDp,_,_)).
 
+%Invariante que impossibilita a adição de conhecimento impreciso quando já existe conhecimento positivo na base de conhecimento
+
 ~(utente(ID,N,I,M,D)) :: (solucoes(ID, (utente(ID,_,Is,Ms,_), Is \= xpto6, Is \= xpto12, Ms \= xpto7), S),
 						  comprimento(S,L),
 						  L==0).
 
+%Invariante que impossibilita a adição de conhecimento impreciso quando já existe conhecimento perfeito negativo na base de conhecimento
+
 ~(utente(ID,N,I,M,D)) :: (solucoes(ID, (-utente(ID,_,_,_,_), utente_perfeito(ID)), S),
 						  comprimento(S,L),
 						  L==0).
+
+%Invariantes que impossibilitam a adição de conhecimento impreciso quando já existe conhecimento interdito na base de conhecimento
 
 ~(utente(ID,N,I,M,D)) :: (solucoes(ID, (utente(ID,_,Is,_,_), nulo_utente_idade(Is)), S),
 						  comprimento(S,L),
@@ -386,6 +474,8 @@ evolucaoNegativa(cuidado(D,H,IDu,IDp,Ds,C)) :- solucoes(Inv, +(-cuidado(D,H,IDu,
 						  comprimento(S,L),
 						  L==0).
 
+%Invariante que impossibilita a adição de conhecimento impreciso repetido
+
 ~(utente(ID,N,I,M,D)) :: (solucoes(ID, (excecao(utente(ID,N,I,M,Ds)), utente_impreciso_idade(ID)), S),
 						  comprimento(S,L),
 						  L=<1).
@@ -394,30 +484,44 @@ evolucaoNegativa(cuidado(D,H,IDu,IDp,Ds,C)) :- solucoes(Inv, +(-cuidado(D,H,IDu,
 						  comprimento(S,L),
 						  L=<1).
 
+%Invariante que impossibilita a adição de conhecimento impreciso quando já existe conhecimento positivo na base de conhecimento
+
 ~(prestador(ID,N,E,IDi,D)) :: (solucoes(ID, (prestador(ID,_,_,IDs,_), IDs \= xpto8), S),
 							   comprimento(S,L),
 							   L==0).
+
+%Invariante que impossibilita a adição de conhecimento impreciso quando já existe conhecimento perfeito negativo na base de conhecimento
 
 ~(prestador(ID,N,E,IDi,D)) :: (solucoes(ID, (-prestador(ID,_,_,_,_), prestador_perfeito(ID)), S),
 							   comprimento(S,L),
 							   L==0).
 
+%Invariante que impossibilita a adição de conhecimento impreciso quando já existe conhecimento interdito na base de conhecimento
+
 ~(prestador(ID,N,E,IDi,D)) :: (solucoes(ID, (prestador(ID,_,_,IDs,_), nulo_prestador_idInst(IDs)), S),
 							   comprimento(S,L),
 							   L==0).
 
+%Invariante que impossibilita a adição de conhecimento impreciso repetido
+
 ~(prestador(ID,N,E,IDi,D)) :: (solucoes(ID, (excecao(prestador(ID,N,E,IDi,Ds)), prestador_impreciso_idInst(ID)), S),
 							   comprimento(S,L),
 							   L=<1).
+
+%Invariante que impossibilita a adição de conhecimento impreciso quando já existe conhecimento positivo na base de conhecimento
 
 ~(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, (cuidado(D,H,IDus,IDp,Dss,Cs), 
 								 IDus \= xpto11, IDus \= xpto14, IDus \= xpto16, IDus \= xpto18, Dss \= xpto9, Dss \= xpto21, Cs \= xpto10), S),
 							     comprimento(S,L),
 							     L==0).
 
+%Invariante que impossibilita a adição de conhecimento impreciso quando já existe conhecimento perfeito negativo na base de conhecimento
+
 ~(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, (-cuidado(D,H,_,IDp,_,_), cuidado_perfeito(D,H,IDp)), S),
 							     comprimento(S,L),
 							     L==0).
+
+%Invariantes que impossibilitam a adição de conhecimento impreciso quando já existe conhecimento interdito na base de conhecimento
 
 ~(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, (cuidado(D,H,_,IDp,Dss,_), nulo_cuidado_descricao(Dss)), S),
 							     comprimento(S,L),
@@ -426,6 +530,8 @@ evolucaoNegativa(cuidado(D,H,IDu,IDp,Ds,C)) :- solucoes(Inv, +(-cuidado(D,H,IDu,
 ~(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, (cuidado(D,H,_,IDp,_,Cs), nulo_cuidado_custo(Cs)), S),
 							     comprimento(S,L),
 							     L==0).
+
+%Invariante que impossibilita a adição de conhecimento impreciso repetido
 
 ~(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, (excecao(cuidado(D,H,IDu,IDp,Ds,C)), cuidado_impreciso_descricao(ID)), S),
 							     comprimento(S,L),
@@ -438,6 +544,8 @@ evolucaoNegativa(cuidado(D,H,IDu,IDp,Ds,C)) :- solucoes(Inv, +(-cuidado(D,H,IDu,
 ~(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, (excecao(cuidado(D,H,IDu,IDp,Ds,C)), cuidado_impreciso_idUt(ID)), S),
 							     comprimento(S,L),
 							     L=<1).
+
+%Extensão do predicado evolucaoImprecisa que permite a adição de conhecimento impreciso
 
 evolucaoImprecisa(utente(ID,N,I,M,D),T) :- solucoes(Inv, ~(utente(ID,N,I,M,D)) :: Inv, S),
 										   insere(excecao(utente(ID,N,I,M,D))),
@@ -460,6 +568,8 @@ evolucaoImprecisa(cuidado(D,H,IDu,IDp,Ds,C),T) :- solucoes(Inv, ~(cuidado(D,H,ID
 										      	  ((nao(T==d), nao(T==idud), nao(T==dc), nao(T==idudc)); cuidado_impreciso_descricao(D,H,IDp); assert(cuidado_impreciso_descricao(D,H,IDp))),
 										      	  ((nao(T==c), nao(T==iduc), nao(T==dc), nao(T==idudc)); cuidado_impreciso_idUt(D,H,IDp); assert(cuidado_impreciso_idUt(D,H,IDp))).
 
+%Invariantes que garante a continuação do conhecimento interdito, isto é, um termo que tinha um argumento interdito à priori, tem que continuar com esse argumento interdito
+
 ^(utente(ID,N,I,M,D)) :: (solucoes(Is,(utente(ID,_,Is,_,_), nulo_utente_idade(Is), I\=xpto1),S),
 						  comprimento(S,L),
 						  L==0).
@@ -468,17 +578,25 @@ evolucaoImprecisa(cuidado(D,H,IDu,IDp,Ds,C),T) :- solucoes(Inv, ~(cuidado(D,H,ID
 						  comprimento(S,L),
 						  L==0).
 
+%Invariante que não permite a adição de conhecimento repetido na base de conhecimento
+
 ^(utente(ID,N,I,M,D)) :: (solucoes(ID,utente(ID,N,I,M,Ds),S),
 						  comprimento(S,L),
 						  L=<1).
+
+%Invariantes que garante a continuação do conhecimento interdito, isto é, um termo que tinha um argumento interdito à priori, tem que continuar com esse argumento interdito
 
 ^(prestador(ID,N,E,IDi,D)) :: (solucoes(IDs,(prestador(ID,_,_,IDs,_), nulo_prestador_idInst(IDs), IDi\=xpto3),S),
 						   	   comprimento(S,L),
 						   	   L==0).
 
+%Invariante que não permite a adição de conhecimento repetido na base de conhecimento
+
 ^(prestador(ID,N,E,IDi,D)) :: (solucoes(ID,prestador(ID,N,E,IDi,D),S),
 						  	   comprimento(S,L),
 						  	   L=<1).
+
+%Invariantes que garante a continuação do conhecimento interdito, isto é, um termo que tinha um argumento interdito à priori, tem que continuar com esse argumento interdito
 
 ^(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, (cuidado(D,H,_,IDp,Dss,_), nulo_cuidado_descricao(Dss), Ds\=xpto4), S),
 							     comprimento(S,L),
@@ -488,9 +606,13 @@ evolucaoImprecisa(cuidado(D,H,IDu,IDp,Ds,C),T) :- solucoes(Inv, ~(cuidado(D,H,ID
 							     comprimento(S,L),
 							     L==0).
 
+%Invariante que não permite a adição de conhecimento repetido na base de conhecimento
+
 ^(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes((D,H,IDp),cuidado(D,H,IDu,IDp,Ds,C),S),
 						  	     comprimento(S,L),
 						  	     L=<1).
+
+%Extensão do predicado evolucaoInterdita que permite a adição de conhecimento interdito
 
 evolucaoInterdita(utente(ID,N,nulo,M,D)) :- M \= nulo,
 											solucoes(Inv, ^(utente(ID,N,xpto1,M,D)) :: Inv, S),
@@ -547,41 +669,61 @@ evolucaoInterdita(cuidado(D,H,IDu,IDp,nulo,nulo)) :- solucoes(Inv, ^(cuidado(D,H
 										  	         removeIncerto(cuidado(D,H,_,IDp,_,_)),
 											         removePerfeito(cuidado(D,H,_,IDp,_,_)).
 
+%Invariante que impossibilita a adição de conhecimento incerto no caso de já existir conhecimento positivo ou incerto sobre esse termo na base de conhecimento
+
 *(utente(ID,N,I,M,D)) :: (solucoes(ID, utente(ID,_,_,_,_), S),
 						  comprimento(S,L),
 						  L==1).
+
+%Invariante que impossibilita a adição de conhecimento incerto no caso de já existir conhecimento negativo sobre esse termo na base de conhecimento
 
 *(utente(ID,N,I,M,D)) :: (solucoes(ID, -utente(ID,_,_,_,_), S),
 						  comprimento(S,L),
 						  L==0).
 
+%Invariante que impossibilita a adição de conhecimento incerto no caso de já existir conhecimento impreciso sobre esse termo na base de conhecimento
+
 *(utente(ID,N,I,M,D)) :: (solucoes(ID, (utente_impreciso_idade(ID); utente_impreciso_morada(ID)), S),
 						  comprimento(S,L),
 						  L==0).
+
+%Invariante que impossibilita a adição de conhecimento incerto no caso de já existir conhecimento positivo ou incerto sobre esse termo na base de conhecimento
 
 *(prestador(ID,N,E,IDi,D)) :: (solucoes(ID, prestador(ID,_,_,_,_), S),
 						  	   comprimento(S,L),
 						 	   L==1).
 
+%Invariante que impossibilita a adição de conhecimento incerto no caso de já existir conhecimento negativo sobre esse termo na base de conhecimento
+
 *(prestador(ID,N,E,IDi,D)) :: (solucoes(ID, -prestador(ID,_,_,_,_), S),
 						  	   comprimento(S,L),
 						  	   L==0).
+
+%Invariante que impossibilita a adição de conhecimento incerto no caso de já existir conhecimento impreciso sobre esse termo na base de conhecimento
 
 *(prestador(ID,N,E,IDi,D)) :: (solucoes(ID, prestador_impreciso_idInst(ID), S),
 						  	   comprimento(S,L),
 						  	   L==0).
 
+%Invariante que impossibilita a adição de conhecimento incerto no caso de já existir conhecimento positivo ou incerto sobre esse termo na base de conhecimento
+
 *(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, cuidado(D,H,_,IDp,_,_), S),
 						  	     comprimento(S,L),
 						 	     L==1).
+
+%Invariante que impossibilita a adição de conhecimento incerto no caso de já existir conhecimento negativo sobre esse termo na base de conhecimento
 
 *(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, -cuidado(D,H,_,IDp,_,_), S),
 						  	     comprimento(S,L),
 						  	     L==0).
 
+%Invariante que impossibilita a adição de conhecimento incerto no caso de já existir conhecimento impreciso sobre esse termo na base de conhecimento
+
 *(cuidado(D,H,IDu,IDp,Ds,C)) :: (solucoes(ID, (cuidado_impreciso_idUt(D,H,IDp); cuidado_impreciso_descricao(D,H,IDp); cuidado_impreciso_preco(D,H,IDp)), S),
 						  	     comprimento(S,L),
 						  	     L==0).
+
+%Extensão do predicado evolucaoIncerta que permite a adição de conhecimento incerto
 
 evolucaoIncerta(utente(ID,N,nulo,M,D)) :- solucoes(Inv, *(utente(ID,N,xpto6,M,D)) :: Inv, S),
 										  insere(utente(ID,N,xpto6,M,D)),
@@ -682,13 +824,20 @@ remove(P) :- assert(P), !, fail.
 insere(P) :- assert(P).
 insere(P) :- retract(P), !, fail.
 
+%Extensão do predicado abaixo1ano que verifica se a diferença entre dois anos é inferior a 1
 
 abaixo1ano(D1,D2) :- (D1-D2) < 1.
 
+%Extensão do predicado abaixo4anos que verifica se a diferença entre dois anos é inferior a 4
+
 abaixo4anos(D1,D2) :- (D1-D2) < 4.
+
+%Extensão do predicado removeLista que, dada uma lista de termos, remove cada um destes da base de conhecimento
 
 removeLista([]).
 removeLista([H|T]) :- retract(H), removeLista(T).
+
+%Extensão do predicado removeIncerto que, dado uma entidade com determinado ID, remove todo o conhecimento incerto associado à mesma
 
 removeIncerto(utente(ID,_,_,_,_)) :- solucoes(utente(ID,N,I,M,D), (utente(ID,N,I,M,D), (I == xpto6; I == xpto12; M == xpto7)), S),
 									 solucoes(-utente(ID,N,I,M,Ds), (-utente(ID,N,I,M,Ds), nao(utente_perfeito(ID))), R),
@@ -704,6 +853,8 @@ removeIncerto(cuidado(D,H,_,IDp,_,_)) :- solucoes(cuidado(D,H,IDu,IDp,Ds,C), (cu
 									 	 removeLista(S),
 									 	 removeLista(R).
 
+%Extensão do predicado removeImpreciso que, dado uma entidade com determinado ID, remove todo o conhecimento impreciso associado à mesma
+
 removeImpreciso(utente(ID,_,_,_,_)) :- solucoes(utente(ID,N,I,M,D), (excecao(utente(ID,N,I,M,D)), I \= xpto6, I \= xpto12, M \= xpto7), S),
 									   removeListaImprecisos(S).
 removeImpreciso(prestador(ID,_,_,_,_)) :- solucoes(prestador(ID,N,E,IDi,D), (excecao(prestador(ID,N,E,IDi,D)), IDi \= xpto8), S),
@@ -711,6 +862,9 @@ removeImpreciso(prestador(ID,_,_,_,_)) :- solucoes(prestador(ID,N,E,IDi,D), (exc
 removeImpreciso(cuidado(D,H,_,IDp,_,_)) :- solucoes(cuidado(D,H,IDu,IDp,Ds,C), (excecao(cuidado(D,H,IDu,IDp,Ds,C)), 
 										   IDu \= xpto11, IDu \= xpto14, IDu \= xpto16, IDu \= xpto18, Ds \= xpto9, Ds \= xpto21, C \= xpto10), S),
 									   	   removeListaImprecisos(S).
+
+%Extensão do predicado removePerfeitoDatas que, dado uma entidade com determinado ID e uma data, remove todo o conhecimento perfeito associado à mesma
+%em que data do termo encontrado seja diferente da data fornecida
 
 removePerfeitoDatas(utente(ID,_,_,_,D)) :- solucoes(utente(ID,N,I,M,Ds), (utente_perfeito(ID), utente(ID,N,I,M,Ds), Ds \= D), S),
 									  	     removeLista(S),
@@ -721,6 +875,8 @@ removePerfeitoDatas(prestador(ID,_,_,_,D)) :- solucoes(prestador(ID,N,E,IDi,Ds),
 										 	  removeLista(S),
 									  	 	  comprimento(S,C1),
 									  	 	  (nao(C1 \= 0); retract(prestador_perfeito(ID))).
+
+%Extensão do predicado removePerfeito que, dado uma entidade com determinado ID, remove todo o conhecimento perfeito associado à mesma
 
 removePerfeito(utente(ID,_,_,_,_)) :- solucoes(utente(ID,N,I,M,Ds), (utente_perfeito(ID), utente(ID,N,I,M,Ds), I\=xpto1, M\=xpto2), S),
 									  solucoes(-utente(ID,N,I,M,Ds), (utente_perfeito(ID), -utente(ID,N,I,M,Ds), I\=xpto1, M\=xpto2), R),
@@ -746,6 +902,8 @@ removePerfeito(cuidado(D,H,_,IDp,_,_)) :- solucoes(cuidado(D,H,IDu,IDp,Ds,C), (c
 									  	  comprimento(R,C2),
 									  	  ((nao(C1 \= 0), nao(C2 \= 0)); retract(cuidado_perfeito(D,H,IDp))).
 
+%Extensão do predicado removeInterdito que, dado uma entidade com determinado ID, remove todo o conhecimento interdito associado à mesma
+
 removeInterdito(utente(ID,_,_,_,_)) :- solucoes(utente(ID,N,xpto1,M,Ds), (utente(ID,N,xpto1,M,Ds), M\=xpto2), S),
 									   solucoes(-utente(ID,N,I,xpto2,Ds), (utente(ID,N,I,xpto2,Ds), I\=xpto1), R),
 									   removeLista(S),
@@ -754,6 +912,8 @@ removeInterdito(cuidado(D,H,_,IDp,_,_)) :- solucoes(cuidado(D,H,IDu,IDp,xpto4,C)
 										   solucoes(cuidado(D,H,IDu,IDp,Ds,xpto5), (cuidado(D,H,IDu,IDp,Ds,xpto5), Ds\=xpto4), R),
 										   removeLista(S),
 									  	   removeLista(R).
+
+%Extensão do predicado removeListaImprecisos que, dada uma lista de termos, remove a respetiva exceção de conhecimento impreciso
 
 removeListaImprecisos([]).
 removeListaImprecisos([utente(ID,_,_,_,_)]) :- retract(excecao(utente(ID,_,_,_,_))), (nao(utente_impreciso_idade(ID)); retract(utente_impreciso_idade(ID))), (nao(utente_impreciso_morada(ID)); retract(utente_impreciso_morada(ID))).
@@ -766,6 +926,8 @@ removeListaImprecisos([cuidado(D,H,_,IDp,_,_)]) :- retract(excecao(cuidado(D,H,_
 												   (nao(cuidado_impreciso_preco(D,H,IDp)); retract(cuidado_impreciso_preco(D,H,IDp))).
 removeListaImprecisos([cuidado(D,H,_,IDp,_,_)|T]) :- retract(excecao(cuidado(D,H,_,IDp,_,_))), removeListaImprecisos(T).
 
+%Extensão do predicado testaPerfeito que, dada uma lista e uma entidade com determinado ID, no caso de a lista ser vazia, 
+%verifica se o termo corresponde a conhecimento perfeito e, em caso negativo, adiciona o utente_perfeito desse ID
 
 testaPerfeito([],utente(ID,_,_,_,_)) :- (utente_perfeito(ID); assert(utente_perfeito(ID))).
 testaPerfeito([],prestador(ID,_,_,_,_)) :- (prestador_perfeito(ID); assert(prestador_perfeito(ID))).
@@ -812,7 +974,9 @@ demoComp(Q1 ## CQ, R) :- demo(Q1,R1), demoComp(CQ,R2), disjuncao(R1,R2,R).
 demoComp(Q1, R) :- demo(Q1,R).
 
 
-%PREDICADOS DEMOS E RELACIONADOS
+%PREDICADOS EXTRAS
+
+%Extensão do predicado utentesAnomalias que determina uma lista dos utentes com conhecimento imperfeito
 
 utentesAnomalias(S) :- solucoes(utente(ID,N,I,M,D), 
 					   (utente(ID,N,I,M,D), 
@@ -821,6 +985,8 @@ utentesAnomalias(S) :- solucoes(utente(ID,N,I,M,D),
 					   I == xpto6; I == xpto12; M == xpto7)), 
 					   S).
 
+%Extensão do predicado prestadoresAnomalias que determina uma lista dos prestadores com conhecimento imperfeito
+
 prestadoresAnomalias(S) :- solucoes(prestador(ID,N,E,IDi,D), 
 						   (prestador(ID,N,E,IDi,D),
 						   (prestador_impreciso_idInst(ID); 
@@ -828,12 +994,16 @@ prestadoresAnomalias(S) :- solucoes(prestador(ID,N,E,IDi,D),
 						   IDi == xpto8)),
 						   S).
 
+%Extensão do predicado cuidadosAnomaliasUtente que, dado o ID de um utente, determina uma lista dos cuidados com conhecimento imperfeito associados a esse ID de utente
+
 cuidadosAnomaliasUtente(IDu,S) :- solucoes(cuidado(D,H,IDu,IDp,Ds,C), 
 								  (cuidado(D,H,IDu,IDp,Ds,C),
 								  (cuidado_impreciso_descricao(D,H,IDp); cuidado_impreciso_preco(D,H,IDp);
 								  nulo_cuidado_descricao(Ds); nulo_cuidado_custo(C);
 								  Ds == xpto9; Ds == xpto21; C == xpto11)), 
 								  S).
+
+%Extensão do predicado cuidadosAnomaliasPrestador que, dado o ID de um prestador, determina uma lista dos cuidados com conhecimento imperfeito associados a esse ID de prestador
 
 cuidadosAnomaliasPrestador(IDp,S) :- solucoes(cuidado(D,H,IDu,IDp,Ds,C), 
 								  	 (cuidado(D,H,IDu,IDp,Ds,C),
